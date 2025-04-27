@@ -9,6 +9,7 @@ import MyPage from './pages/MyPage';
 import DetailPage from './pages/DetailPage';
 import Layout from './components/Layout';
 
+// .
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false); // 👈 추가
 
