@@ -1,18 +1,21 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext';  // ✅ 추가
 
-function Login({ setIsLoggedIn }) { // 👈 props로 받기
+function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const navigate = useNavigate();
+
+  const { setIsLoggedIn } = useAuth(); // ✅ props 대신 context에서 가져오기
 
   const handleLogin = (e) => {
     e.preventDefault();
     console.log('이메일:', email);
     console.log('비밀번호:', password);
 
-    setIsLoggedIn(true); // 👈 로그인 상태 true로 변경!
-    navigate('/'); // 홈으로 이동
+    setIsLoggedIn(true); // ✅ 전역 상태 변경
+    navigate('/');
   };
 
   return (

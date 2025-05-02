@@ -1,59 +1,44 @@
-
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { FaHeart, FaRegHeart } from 'react-icons/fa';
+import { useAuth } from '../contexts/AuthContext';
+import { useProperty } from '../contexts/PropertyContext';
 
 function FindProperty() {
+  const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState('');
   const [category, setCategory] = useState('');
+  const [region, setRegion] = useState('');
   const [showResults, setShowResults] = useState(false);
-  const [filteredProperties, setFilteredProperties] = useState([]);
-  const navigate = useNavigate();
 
-  const properties = [
-    { id: 1, title: "포항시 빈집", tags: ["주거용", "리모델링 가능"], image: "https://via.placeholder.com/300x200" },
-    { id: 2, title: "해남군 빈집", tags: ["전원주택", "자연속", "주거용"], image: "https://via.placeholder.com/300x200" },
-    { id: 3, title: "제주시 상가건물", tags: ["상업용", "관광지근처"], image: "https://via.placeholder.com/300x200" },
-    { id: 4, title: "강릉시 빈집", tags: ["주거용", "바닷가"], image: "https://via.placeholder.com/300x200" }
-  ];
-
-  const handleSearchChange = (e) => {
-    setSearchQuery(e.target.value);
-  };
-
-  const handleCategoryChange = (e) => {
-    setCategory(e.target.value);
-  };
+  const { isLoggedIn } = useAuth();
+  const { properties, favorites, toggleFavorite } = useProperty();
 
   const handleSearchSubmit = () => {
-    const keyword = searchQuery.trim().toLowerCase();
-
-    const result = properties.filter((property) => {
-      const titleMatch = property.title.toLowerCase().includes(keyword);
-      const tagsMatch = property.tags.some(tag => tag.toLowerCase().includes(keyword));
-      const categoryMatch = category ? property.tags.includes(category) : true;
-      return (titleMatch || tagsMatch) && categoryMatch;
-    });
-
-    setFilteredProperties(result);
     setShowResults(true);
   };
 
   const handleReset = () => {
     setSearchQuery('');
     setCategory('');
+    setRegion('');
     setShowResults(false);
-    setFilteredProperties([]);
   };
 
   const handleKeyDown = (e) => {
-    if (e.key === 'Enter') {
-      handleSearchSubmit();
-    }
+    if (e.key === 'Enter') handleSearchSubmit();
   };
+
+  const filtered = properties.filter((p) => {
+    const matchesQuery = p.title.includes(searchQuery);
+    const matchesCategory = category ? p.tags.includes(category) : true;
+    const matchesRegion = region ? p.region === region : true;
+    return matchesQuery && matchesCategory && matchesRegion;
+  });
 
   return (
     <div style={{ position: "relative", width: "100%", height: "100vh" }}>
-      {/* 지도 영역 */}
+      {/* 지도 자리 */}
       <div style={{
         width: "100%",
         height: "100%",
@@ -68,7 +53,7 @@ function FindProperty() {
         </p>
       </div>
 
-      {/* 검색창 영역 */}
+      {/* 검색창 */}
       <div style={{
         position: "absolute",
         top: "30px",
@@ -82,30 +67,50 @@ function FindProperty() {
         <input
           type="text"
           value={searchQuery}
-          onChange={handleSearchChange}
+          onChange={(e) => setSearchQuery(e.target.value)}
           onKeyDown={handleKeyDown}
           placeholder="검색어를 입력하세요 (예: 지역명, 관광지)"
           style={{ flex: 2, padding: "10px", fontSize: "1rem" }}
         />
         <select
           value={category}
-          onChange={handleCategoryChange}
+          onChange={(e) => setCategory(e.target.value)}
           style={{ flex: 1, padding: "10px", fontSize: "1rem" }}
         >
           <option value="">용도 선택</option>
           <option value="주거용">주거용</option>
           <option value="상업용">상업용</option>
-          <option value="기타">기타</option>
         </select>
-        <button onClick={handleSearchSubmit} style={{ padding: "10px 20px", fontSize: "1rem" }}>
-          검색
-        </button>
-        <button onClick={handleReset} style={{ padding: "10px 20px", fontSize: "1rem" }}>
-          초기화
-        </button>
+        <select
+          value={region}
+          onChange={(e) => setRegion(e.target.value)}
+          style={{ flex: 1, padding: "10px", fontSize: "1rem" }}
+        >
+          <option value="">지역 선택</option>
+          <option value="서울특별시">서울특별시</option>
+          <option value="부산광역시">부산광역시</option>
+          <option value="대구광역시">대구광역시</option>
+          <option value="인천광역시">인천광역시</option>
+          <option value="광주광역시">광주광역시</option>
+          <option value="대전광역시">대전광역시</option>
+          <option value="울산광역시">울산광역시</option>
+          <option value="세종특별자치시">세종특별자치시</option>
+          <option value="경기도">경기도</option>
+          <option value="강원도">강원도</option>
+          <option value="충청북도">충청북도</option>
+          <option value="충청남도">충청남도</option>
+          <option value="전라북도">전라북도</option>
+          <option value="전라남도">전라남도</option>
+          <option value="경상북도">경상북도</option>
+          <option value="경상남도">경상남도</option>
+          <option value="제주특별자치도">제주특별자치도</option>
+
+        </select>
+        <button onClick={handleSearchSubmit} style={{ padding: "10px 20px" }}>검색</button>
+        <button onClick={handleReset} style={{ padding: "10px 20px" }}>초기화</button>
       </div>
 
-      {/* 검색 결과 리스트 */}
+      {/* 검색 결과 */}
       {showResults && (
         <div style={{
           position: "absolute",
@@ -121,9 +126,9 @@ function FindProperty() {
           zIndex: 2,
         }}>
           <h2>검색 결과</h2>
-          {filteredProperties.length > 0 ? (
-            <div style={{ display: "flex", flexDirection: "column", gap: "10px", marginTop: "10px" }}>
-              {filteredProperties.map((property) => (
+          {filtered.length > 0 ? (
+            <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+              {filtered.map((property) => (
                 <div
                   key={property.id}
                   onClick={() => navigate(`/detail/${property.id}`)}
@@ -132,17 +137,48 @@ function FindProperty() {
                     padding: "10px",
                     borderRadius: "8px",
                     backgroundColor: "#f9f9f9",
-                    cursor: "pointer"
+                    position: "relative",
+                    cursor: "pointer",
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center"
                   }}
                 >
-                  <img src={property.image} alt="대표 사진" style={{ width: "100%", height: "150px", objectFit: "cover", borderRadius: "6px" }} />
-                  <h3>{property.title}</h3>
-                  <p>#{property.tags.join(' #')}</p>
+                  <div>
+                    <h3>{property.title}</h3>
+                    <p>#{property.tags.join(' #')}</p>
+                  </div>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      if (!isLoggedIn) {
+                        alert("로그인이 필요한 기능입니다.");
+                        navigate("/login");
+                        return;
+                      }
+                      toggleFavorite(property.id);
+                    }}
+                    style={{
+                      width: "40px",
+                      height: "40px",
+                      borderRadius: "50%",
+                      border: "1px solid black",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      background: "white",
+                      cursor: "pointer"
+                    }}
+                  >
+                    {favorites.includes(property.id)
+                      ? <FaHeart color="red" size={20} />
+                      : <FaRegHeart size={20} />}
+                  </button>
                 </div>
               ))}
             </div>
           ) : (
-            <p style={{ color: "#888" }}>검색 결과가 없습니다.</p>
+            <p>검색 결과가 없습니다.</p>
           )}
         </div>
       )}

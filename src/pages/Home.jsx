@@ -1,32 +1,26 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Link } from 'react-router-dom';
-
-const sampleProperties = [
-  { id: 1, title: "해남군 빈집", tags: ["주거용", "자연속"] },
-  { id: 2, title: "포항시 소형주택", tags: ["주거용", "리모델링"] },
-  { id: 3, title: "제주시 상가건물", tags: ["상업용", "관광지 근처"] },
-  { id: 4, title: "강릉시 바닷가 빈집", tags: ["주거용", "바닷가"] },
-  { id: 5, title: "서울시 빈집", tags: ["주거용", "편의시설"] },
-  { id: 6, title: "광주 주택", tags: ["주거용", "교통 편리"] },
-  { id: 7, title: "부산 상가", tags: ["상업용", "도심 근처"] },
-  { id: 8, title: "춘천 전원주택", tags: ["주거용", "자연환경"] },
-];
+import { useProperty } from '../contexts/PropertyContext';
 
 function Home() {
   const navigate = useNavigate();
+  const { properties } = useProperty();
   const [currentSlide, setCurrentSlide] = useState(0);
 
-  const totalSlides = Math.ceil(sampleProperties.length / 4);
-
-  const visibleProperties = sampleProperties.slice(currentSlide * 4, currentSlide * 4 + 4);
+  const itemsPerSlide = 4;
+  const totalSlides = Math.ceil(properties.length / itemsPerSlide);
+  const visibleProperties = properties.slice(
+    currentSlide * itemsPerSlide,
+    currentSlide * itemsPerSlide + itemsPerSlide
+  );
 
   const handlePrev = () => {
     if (currentSlide > 0) setCurrentSlide(currentSlide - 1);
   };
 
   const handleNext = () => {
-    if ((currentSlide + 1) * 4 < sampleProperties.length) {
+    if ((currentSlide + 1) * itemsPerSlide < properties.length) {
       setCurrentSlide(currentSlide + 1);
     }
   };
@@ -49,10 +43,10 @@ function Home() {
         <h2>추천 매물</h2>
         <div style={{ display: "flex", justifyContent: "center", position: "relative", marginTop: "20px" }}>
           <div style={{
-            display: "flex",
+            display: "grid",
+            gridTemplateColumns: `repeat(${itemsPerSlide}, 1fr)`,
             gap: "20px",
-            transform: `translateX(-${currentSlide * 1100}px)`,
-            transition: "transform 0.6s ease",
+            width: "1000px"
           }}>
             {visibleProperties.map(property => (
               <div
@@ -72,7 +66,7 @@ function Home() {
                 onMouseEnter={(e) => e.currentTarget.style.transform = "scale(1.05)"}
                 onMouseLeave={(e) => e.currentTarget.style.transform = "scale(1)"}
               >
-                <img src="/default-house.png" alt="빈집" style={{ width: "100%", height: "200px", objectFit: "cover" }} />
+                <img src={property.image} alt="빈집" style={{ width: "100%", height: "200px", objectFit: "cover" }} />
                 <div style={{ padding: "10px" }}>
                   <h4>{property.title}</h4>
                   <p style={{ fontSize: "0.8rem", color: "#666" }}>#{property.tags.join(' #')}</p>
@@ -81,11 +75,10 @@ function Home() {
             ))}
           </div>
 
-          {/* 화살표 */}
-          {sampleProperties.length > 4 && currentSlide > 0 && (
+          {properties.length > itemsPerSlide && currentSlide > 0 && (
             <button onClick={handlePrev} style={arrowStyle("left")}>◀</button>
           )}
-          {sampleProperties.length > 4 && currentSlide < totalSlides - 1 && (
+          {properties.length > itemsPerSlide && currentSlide < totalSlides - 1 && (
             <button onClick={handleNext} style={arrowStyle("right")}>▶</button>
           )}
         </div>
