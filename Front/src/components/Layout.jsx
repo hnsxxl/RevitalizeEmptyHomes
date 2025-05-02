@@ -1,0 +1,52 @@
+import { useLocation, Link, useNavigate } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext'; // ✅ 추가
+
+function Layout({ children }) {
+  const location = useLocation();
+  const navigate = useNavigate();
+  const isHome = location.pathname === '/';
+
+  const { isLoggedIn, setIsLoggedIn } = useAuth(); // ✅ context로 대체
+
+  const handleLogout = () => {
+    setIsLoggedIn(false);
+    navigate('/');
+  };
+
+  return (
+    <div>
+      <nav style={{ padding: "20px", display: "flex", justifyContent: "space-between", backgroundColor: "#f5f5f5", alignItems: "center" }}>
+        <div style={{ fontSize: "1.5rem", fontWeight: "bold" }}>
+          {!isHome && (
+            <Link to="/" style={{ textDecoration: "none", color: "black" }}>빈집찾기</Link>
+          )}
+        </div>
+
+        <div style={{ display: "flex", gap: "20px", alignItems: "center" }}>
+          {!isHome && (
+            <>
+              <Link to="/find-property" style={{ textDecoration: "none", color: "black" }}>매물찾기</Link>
+              <Link to="/register-property" style={{ textDecoration: "none", color: "black" }}>매도의뢰</Link>
+            </>
+          )}
+          {isLoggedIn ? (
+            <>
+              <Link to="/mypage" style={{ textDecoration: "none", color: "gray" }}>마이페이지</Link>
+              <button onClick={handleLogout} style={{ background: "none", border: "none", color: "gray", cursor: "pointer", fontSize: "1rem" }}>
+                로그아웃
+              </button>
+            </>
+          ) : (
+            <>
+              <Link to="/login" style={{ textDecoration: "none", color: "gray" }}>로그인</Link>
+              <Link to="/signup" style={{ textDecoration: "none", color: "gray" }}>회원가입</Link>
+            </>
+          )}
+        </div>
+      </nav>
+      <main>{children}</main>
+    </div>
+  );
+}
+
+export default Layout;
