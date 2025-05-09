@@ -1,29 +1,35 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../contexts/AuthContext';  // ✅ 추가
+import { useNavigate, Link } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext';
+import './Login.css';
 
 function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const navigate = useNavigate();
-
-  const { setIsLoggedIn } = useAuth(); // ✅ props 대신 context에서 가져오기
+  const { setIsLoggedIn } = useAuth();
 
   const handleLogin = (e) => {
     e.preventDefault();
-    console.log('이메일:', email);
-    console.log('비밀번호:', password);
 
-    setIsLoggedIn(true); // ✅ 전역 상태 변경
-    navigate('/');
+    const storedEmail = localStorage.getItem('userEmail');
+    const storedPassword = localStorage.getItem('userPassword');
+
+    if (email === storedEmail && password === storedPassword) {
+      setIsLoggedIn(true);
+      navigate('/');
+    } else {
+      alert('❌ 이메일 또는 비밀번호가 올바르지 않습니다.');
+    }
   };
 
   return (
-    <div style={{ padding: "20px" }}>
-      <h1>로그인</h1>
-      <form onSubmit={handleLogin}>
-        <div style={{ marginBottom: "10px" }}>
-          <label>이메일: </label><br />
+    <div className="login-wrapper">
+      <form className="login-box" onSubmit={handleLogin}>
+        <h1 className="login-title">로그인</h1>
+        <hr className="login-divider" />
+        <div className="login-input-group">
+          <label>이메일</label>
           <input
             type="email"
             value={email}
@@ -31,8 +37,8 @@ function Login() {
             required
           />
         </div>
-        <div style={{ marginBottom: "10px" }}>
-          <label>비밀번호: </label><br />
+        <div className="login-input-group">
+          <label>비밀번호</label>
           <input
             type="password"
             value={password}
@@ -40,7 +46,10 @@ function Login() {
             required
           />
         </div>
-        <button type="submit">로그인</button>
+        <button type="submit" className="login-button">로그인</button>
+        <div className="signup-link">
+          <Link to="/signup">회원가입</Link>
+        </div>
       </form>
     </div>
   );
