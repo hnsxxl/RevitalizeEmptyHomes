@@ -43,7 +43,7 @@ function Signup() {
       return;
     }
 
-    // ✅ 회원 정보 저장
+    // 회원가입 시 회원 정보 저장 -> 백 서버 연결 후 제거하기
     localStorage.setItem('userEmail', email);
     localStorage.setItem('userPassword', password);
 
