@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Link } from 'react-router-dom';
 import { useProperty } from '../contexts/PropertyContext';
+import './Home.css';
 
 function Home() {
   const navigate = useNavigate();
@@ -26,12 +27,12 @@ function Home() {
   };
 
   return (
-    <div style={{ maxWidth: "1200px", margin: "0 auto", padding: "20px" }}>
-      <section style={{ marginBottom: "40px" }}>
-        <h1 style={{ textAlign: "center", marginBottom: "20px" }}>빈집찾기</h1>
-        <div style={{ display: "flex", justifyContent: "center", gap: "30px" }}>
-          <Link to="/find-property">매물찾기</Link>
-          <Link to="/register-property">매도의뢰</Link>
+    <div className="home-container">
+      <section className="home-header">
+        <div className="nav-links">
+          <h1 className="site-title">빈집찾기</h1>
+          <Link to="/find-property" className="link-find">매물찾기</Link>
+          <Link to="/register-property" className="link-register">매도의뢰</Link>
         </div>
       </section>
 
@@ -39,14 +40,16 @@ function Home() {
         <h2 style={{ textAlign: "center", lineHeight: "300px" }}>사이트 소개 사진 자리</h2>
       </section>
 
-      <section style={{ textAlign: "center" }}>
+      <section className="recommend-section" style={{ textAlign: "center" }}>
         <h2>추천 매물</h2>
         <div style={{ display: "flex", justifyContent: "center", position: "relative", marginTop: "20px" }}>
           <div style={{
             display: "grid",
             gridTemplateColumns: `repeat(${itemsPerSlide}, 1fr)`,
             gap: "20px",
-            width: "1000px"
+            width: "calc(1000px + 40px)",
+            margin: "0 auto",
+            position: "relative"
           }}>
             {visibleProperties.map(property => (
               <div
@@ -76,10 +79,10 @@ function Home() {
           </div>
 
           {properties.length > itemsPerSlide && currentSlide > 0 && (
-            <button onClick={handlePrev} style={arrowStyle("left")}>◀</button>
+            <button className="arrow-btn left" onClick={handlePrev}>◀</button>
           )}
           {properties.length > itemsPerSlide && currentSlide < totalSlides - 1 && (
-            <button onClick={handleNext} style={arrowStyle("right")}>▶</button>
+            <button className="arrow-btn right" onClick={handleNext}>▶</button>
           )}
         </div>
       </section>
