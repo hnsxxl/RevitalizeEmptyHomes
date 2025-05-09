@@ -3,6 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { FaHeart, FaRegHeart, FaShareAlt, FaPhone } from 'react-icons/fa';
 import { useAuth } from '../contexts/AuthContext';
 import { useProperty } from '../contexts/PropertyContext';
+import './DetailPage.css'; 
 
 function DetailPage() {
   const { id } = useParams();
@@ -37,65 +38,44 @@ function DetailPage() {
   };
 
   return (
-    <div style={{ padding: "20px", maxWidth: "1000px", margin: "0 auto", display: "flex", gap: "30px" }}>
-      <div style={{ flex: 1 }}>
-        <div style={{
-          width: "100%",
-          height: "400px",
-          backgroundColor: "#ddd",
-          borderRadius: "10px",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          fontSize: "24px",
-          color: "#666"
-        }}>
-          (여기에 3D 뷰 자리)
-        </div>
+    <>
+      <div className="detail-header">
+        <h2 className="detail-heading">매물 찾기</h2>
+        <hr className="detail-divider" />
       </div>
 
-      <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: "20px" }}>
-        <h1 style={{ fontSize: "28px" }}>{property.title}</h1>
-
-        <div style={{ fontSize: "18px", lineHeight: "1.8" }}>
-          {property.tags && property.tags.map((tag, i) => (
-            <div key={i}>• {tag}</div>
-          ))}
+      <div className="detail-container">
+        <div className="detail-left">
+          <div className="detail-3d-view">
+            (여기에 3D 뷰 자리)
+          </div>
         </div>
 
-        <div style={{ display: "flex", gap: "20px", marginTop: "20px" }}>
-          <button onClick={handleLike} style={{
-            border: "1px solid #ccc",
-            borderRadius: "50%",
-            padding: "15px",
-            backgroundColor: "white",
-            cursor: "pointer"
-          }}>
-            {liked ? <FaHeart color="red" size={24} /> : <FaRegHeart size={24} />}
-          </button>
+        <div className="detail-right">
+          <h1 className="detail-title">{property.title}</h1>
 
-          <button onClick={handleShare} style={{
-            border: "1px solid #ccc",
-            borderRadius: "50%",
-            padding: "15px",
-            backgroundColor: "white",
-            cursor: "pointer"
-          }}>
-            <FaShareAlt size={24} />
-          </button>
+          <div className="detail-tags">
+            {property.tags && property.tags.map((tag, i) => (
+              <div key={i}>• {tag}</div>
+            ))}
+          </div>
 
-          <button onClick={handleCall} style={{
-            border: "1px solid #ccc",
-            borderRadius: "50%",
-            padding: "15px",
-            backgroundColor: "white",
-            cursor: "pointer"
-          }}>
-            <FaPhone size={24} />
-          </button>
+          <div className="detail-buttons">
+            <button onClick={handleLike} className="detail-button">
+              {liked ? <FaHeart color="red" size={24} /> : <FaRegHeart size={24} />}
+            </button>
+
+            <button onClick={handleShare} className="detail-button">
+              <FaShareAlt size={24} />
+            </button>
+
+            <button onClick={handleCall} className="detail-button">
+              <FaPhone size={24} />
+            </button>
+          </div>
         </div>
       </div>
-    </div>
+    </>
   );
 }
 
