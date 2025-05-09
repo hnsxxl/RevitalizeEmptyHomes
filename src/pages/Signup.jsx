@@ -1,23 +1,68 @@
 import { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import './Signup.css';
 
 function Signup() {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [error, setError] = useState('');
+
+  const navigate = useNavigate();
+
+  const validatePassword = (pw) => {
+    const lengthCheck = pw.length >= 8;
+    const letterCheck = /[a-zA-Z]/.test(pw);
+    const numberCheck = /\d/.test(pw);
+    const specialCharCheck = /[!@#$%^&*(),.?":{}|<>]/.test(pw);
+    return {
+      isValid: lengthCheck && letterCheck && numberCheck && specialCharCheck,
+      lengthCheck,
+      letterCheck,
+      numberCheck,
+      specialCharCheck
+    };
+  };
+
+  const passwordsMatch = password && confirmPassword && password === confirmPassword;
 
   const handleSignup = (e) => {
     e.preventDefault();
-    console.log('이름:', name);
-    console.log('이메일:', email);
-    console.log('비밀번호:', password);
+    setError('');
+
+    const pwStatus = validatePassword(password);
+
+    if (!pwStatus.isValid) {
+      setError('❌ 비밀번호는 8자리 이상이며 영문, 숫자, 특수문자를 모두 포함해야 합니다.');
+      return;
+    }
+
+    if (!passwordsMatch) {
+      setError('❌ 비밀번호가 일치하지 않습니다.');
+      return;
+    }
+
+    // ✅ 회원 정보 저장
+    localStorage.setItem('userEmail', email);
+    localStorage.setItem('userPassword', password);
+
+    alert('회원가입이 완료되었습니다!');
+    navigate('/login');
   };
 
   return (
-    <div style={{ padding: "20px" }}>
-      <h1>회원가입</h1>
-      <form onSubmit={handleSignup}>
-        <div style={{ marginBottom: "10px" }}>
-          <label>이름: </label><br />
+    <div className="signup-wrapper">
+      <form className="signup-box" onSubmit={handleSignup}>
+        <h1 className="signup-title">회원가입</h1>
+        <hr className="signup-divider" />
+
+        {error && (
+          <div style={{ color: 'red', marginBottom: '10px' }}>{error}</div>
+        )}
+
+        <div className="signup-input-group horizontal">
+          <label>이름</label>
           <input
             type="text"
             value={name}
@@ -25,8 +70,9 @@ function Signup() {
             required
           />
         </div>
-        <div style={{ marginBottom: "10px" }}>
-          <label>이메일: </label><br />
+
+        <div className="signup-input-group horizontal">
+          <label>이메일</label>
           <input
             type="email"
             value={email}
@@ -34,8 +80,9 @@ function Signup() {
             required
           />
         </div>
-        <div style={{ marginBottom: "10px" }}>
-          <label>비밀번호: </label><br />
+
+        <div className="signup-input-group horizontal">
+          <label>비밀번호</label>
           <input
             type="password"
             value={password}
@@ -43,7 +90,36 @@ function Signup() {
             required
           />
         </div>
-        <button type="submit">회원가입</button>
+
+        <div className="signup-input-group horizontal">
+          <label>비밀번호 확인</label>
+          <input
+            type="password"
+            value={confirmPassword}
+            onChange={(e) => setConfirmPassword(e.target.value)}
+            required
+          />
+        </div>
+
+        {confirmPassword && (
+          <div
+            style={{
+              fontSize: '0.85rem',
+              marginBottom: '10px',
+              color: passwordsMatch ? 'green' : 'red'
+            }}
+          >
+            {passwordsMatch
+              ? '✅ 비밀번호가 일치합니다'
+              : '❌ 비밀번호가 일치하지 않습니다'}
+          </div>
+        )}
+
+        <button type="submit" className="signup-button">회원가입</button>
+
+        <div className="signup-footer">
+          이미 계정이 있으신가요? <Link to="/login">로그인</Link>
+        </div>
       </form>
     </div>
   );
