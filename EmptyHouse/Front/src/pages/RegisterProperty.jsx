@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import './RegisterProperty.css';
 
 function RegisterProperty() {
   const [formData, setFormData] = useState({
@@ -31,66 +32,81 @@ function RegisterProperty() {
   };
 
   return (
-    <div style={{ maxWidth: '800px', margin: '0 auto', padding: '20px' }}>
+    <div className="register-container">
       <h1>매도 의뢰</h1>
       <form onSubmit={handleSubmit}>
-        {/* 의뢰인 정보 구역 */}
-        <fieldset style={{ marginBottom: '20px' }}>
+        {/* 의뢰인 정보 */}
+        <fieldset className="form-section">
           <legend><strong>의뢰인 정보</strong></legend>
-          <label>
-            성함: <input type="text" name="name" value={formData.name} onChange={handleChange} required /><br /><br />
-          </label>
-          <label>
-            연락처: <input type="text" name="contact" value={formData.contact} onChange={handleChange} required /><br /><br />
-          </label>
-          <label>
-            이메일: <input type="email" name="email" value={formData.email} onChange={handleChange} required /><br /><br />
-          </label>
+
+          <div className="form-row">
+            <label htmlFor="name">성함</label>
+            <input type="text" id="name" name="name" value={formData.name} onChange={handleChange} required />
+          </div>
+
+          <div className="form-row">
+            <label htmlFor="contact">연락처</label>
+            <input type="text" id="contact" name="contact" value={formData.contact} onChange={handleChange} required />
+          </div>
+
+          <div className="form-row">
+            <label htmlFor="email">이메일</label>
+            <input type="email" id="email" name="email" value={formData.email} onChange={handleChange} required />
+          </div>
         </fieldset>
 
-        {/* 매도 정보 구역 */}
-        <fieldset style={{ marginBottom: '20px' }}>
+        {/* 매도 정보 */}
+        <fieldset className="form-section">
           <legend><strong>매도 정보</strong></legend>
-          <label>
-            주소: <input type="text" name="address" value={formData.address} onChange={handleChange} required /><br /><br />
-          </label>
-          <label>
-            면적: <input type="text" name="area" value={formData.area} onChange={handleChange} required /><br /><br />
-          </label>
-          <label>
-            준공년도: <input type="text" name="yearBuilt" value={formData.yearBuilt} onChange={handleChange} required /><br /><br />
-          </label>
-          <label>
-            층수: <input type="text" name="floors" value={formData.floors} onChange={handleChange} required /><br /><br />
-          </label>
-          <label>
-            용도: <input type="text" name="usage" value={formData.usage} onChange={handleChange} required /><br /><br />
-          </label>
-          <label>
-            주변 관광지: <input type="text" name="touristSpots" value={formData.touristSpots} onChange={handleChange} /><br /><br />
-          </label>
+
+          <div className="form-row">
+            <label htmlFor="address">주소</label>
+            <input type="text" id="address" name="address" value={formData.address} onChange={handleChange} required />
+          </div>
+
+          <div className="form-row">
+            <label htmlFor="area">면적</label>
+            <input type="text" id="area" name="area" value={formData.area} onChange={handleChange} required />
+          </div>
+
+          <div className="form-row">
+            <label htmlFor="yearBuilt">준공년도</label>
+            <input type="text" id="yearBuilt" name="yearBuilt" value={formData.yearBuilt} onChange={handleChange} required />
+          </div>
+
+          <div className="form-row">
+            <label htmlFor="floors">층수</label>
+            <input type="text" id="floors" name="floors" value={formData.floors} onChange={handleChange} required />
+          </div>
+
+          <div className="form-row">
+            <label htmlFor="usage">용도</label>
+            <input type="text" id="usage" name="usage" value={formData.usage} onChange={handleChange} required />
+          </div>
+
+          <div className="form-row">
+            <label htmlFor="touristSpots">주변 관광지</label>
+            <input type="text" id="touristSpots" name="touristSpots" value={formData.touristSpots} onChange={handleChange} />
+          </div>
         </fieldset>
 
         {/* 이미지 업로드 */}
-        <fieldset style={{ marginBottom: '20px' }}>
+        <fieldset className="form-section">
           <legend><strong>대표 사진 업로드</strong></legend>
           <input type="file" accept="image/*" multiple onChange={handleImageChange} /><br /><br />
-          {/* 미리보기 */}
-          <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+          <div className="image-preview-box">
             {formData.images.map((image, idx) => (
               <img
                 key={idx}
                 src={URL.createObjectURL(image)}
                 alt={`preview-${idx}`}
-                style={{ width: '100px', height: '100px', objectFit: 'cover', borderRadius: '8px' }}
+                className="image-preview"
               />
             ))}
           </div>
         </fieldset>
 
-        <button type="submit" style={{ padding: '15px', backgroundColor: '#4CAF50', color: 'white', fontSize: '1rem', border: 'none', borderRadius: '8px', cursor: 'pointer', width: '100%' }}>
-          등록하기
-        </button>
+        <button type="submit" className="submit-button">등록하기</button>
       </form>
     </div>
   );

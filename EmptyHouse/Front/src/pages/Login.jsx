@@ -1,43 +1,35 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import axios from 'axios';
+import './Login.css';
 
 function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const navigate = useNavigate();
-
   const { setIsLoggedIn } = useAuth();
 
-  const handleLogin = async (e) => {
+  const handleLogin = (e) => {
     e.preventDefault();
 
-    try {
-      const res = await axios.post("http://localhost:8000/login", {
-        email,
-        password
-      });
+    const storedEmail = localStorage.getItem('userEmail');
+    const storedPassword = localStorage.getItem('userPassword');
 
-      const token = res.data.access_token;
-      localStorage.setItem("token", token);
-      setIsLoggedIn(true);                  
-      alert("로그인 성공!");
-
-      navigate('/'); 
-
-    } catch (err) {
-      console.error(err);
-      alert("로그인 실패! 이메일 또는 비밀번호를 확인하세요.");
+    if (email === storedEmail && password === storedPassword) {
+      setIsLoggedIn(true);
+      navigate('/');
+    } else {
+      alert('❌ 이메일 또는 비밀번호가 올바르지 않습니다.');
     }
   };
 
   return (
-    <div style={{ padding: "20px" }}>
-      <h1>로그인</h1>
-      <form onSubmit={handleLogin}>
-        <div style={{ marginBottom: "10px" }}>
-          <label>이메일: </label><br />
+    <div className="login-wrapper">
+      <form className="login-box" onSubmit={handleLogin}>
+        <h1 className="login-title">로그인</h1>
+        <hr className="login-divider" />
+        <div className="login-input-group">
+          <label>이메일</label>
           <input
             type="email"
             value={email}
@@ -45,8 +37,8 @@ function Login() {
             required
           />
         </div>
-        <div style={{ marginBottom: "10px" }}>
-          <label>비밀번호: </label><br />
+        <div className="login-input-group">
+          <label>비밀번호</label>
           <input
             type="password"
             value={password}
@@ -54,7 +46,10 @@ function Login() {
             required
           />
         </div>
-        <button type="submit">로그인</button>
+        <button type="submit" className="login-button">로그인</button>
+        <div className="signup-link">
+          <Link to="/signup">회원가입</Link>
+        </div>
       </form>
     </div>
   );

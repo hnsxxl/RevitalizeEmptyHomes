@@ -1,12 +1,10 @@
-import { useLocation, Link, useNavigate } from 'react-router-dom';
-import { useAuth } from '../contexts/AuthContext'; // ✅ 추가
+import { Link, useNavigate } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext';
+import './Layout.css'; // CSS 파일 불러오기
 
 function Layout({ children }) {
-  const location = useLocation();
   const navigate = useNavigate();
-  const isHome = location.pathname === '/';
-
-  const { isLoggedIn, setIsLoggedIn } = useAuth(); // ✅ context로 대체
+  const { isLoggedIn, setIsLoggedIn } = useAuth();
 
   const handleLogout = () => {
     setIsLoggedIn(false);
@@ -15,32 +13,24 @@ function Layout({ children }) {
 
   return (
     <div>
-      <nav style={{ padding: "20px", display: "flex", justifyContent: "space-between", backgroundColor: "#f5f5f5", alignItems: "center" }}>
-        <div style={{ fontSize: "1.5rem", fontWeight: "bold" }}>
-          {!isHome && (
-            <Link to="/" style={{ textDecoration: "none", color: "black" }}>빈집찾기</Link>
-          )}
-        </div>
+      <nav className="navbar">
+        <Link to="/" className="logo-area">
+          <img src="/logo.png" alt="로고" className="logo-img" />
+          <span className="logo-text">머무름</span>
+        </Link>
 
-        <div style={{ display: "flex", gap: "20px", alignItems: "center" }}>
-          {!isHome && (
-            <>
-              <Link to="/find-property" style={{ textDecoration: "none", color: "black" }}>매물찾기</Link>
-              <Link to="/register-property" style={{ textDecoration: "none", color: "black" }}>매도의뢰</Link>
-            </>
-          )}
+        <div className="nav-right">
           {isLoggedIn ? (
             <>
-              <Link to="/mypage" style={{ textDecoration: "none", color: "gray" }}>마이페이지</Link>
-              <button onClick={handleLogout} style={{ background: "none", border: "none", color: "gray", cursor: "pointer", fontSize: "1rem" }}>
-                로그아웃
-              </button>
+              <Link to="/mypage" className="mypage-link">마이페이지</Link>
+              <button onClick={handleLogout} className="logout-btn">로그아웃</button>
             </>
           ) : (
-            <>
-              <Link to="/login" style={{ textDecoration: "none", color: "gray" }}>로그인</Link>
-              <Link to="/signup" style={{ textDecoration: "none", color: "gray" }}>회원가입</Link>
-            </>
+            <div className="auth-box">
+              <Link to="/login" className="auth-link">로그인</Link>
+              <span className="divider">|</span>
+              <Link to="/signup" className="auth-link">회원가입</Link>
+            </div>
           )}
         </div>
       </nav>

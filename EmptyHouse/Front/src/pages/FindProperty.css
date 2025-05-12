@@ -1,0 +1,89 @@
+.map-placeholder {
+  width: 100%;
+  height: 100%;
+  background-color: #eee;
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 1;
+  text-align: center;
+  line-height: 100vh;
+  color: #aaa;
+}
+
+.search-bar {
+  position: absolute;
+  top: 30px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 80%;
+  display: flex;
+  gap: 10px;
+  z-index: 3;
+}
+
+.search-bar input,
+.search-bar select {
+  padding: 10px;
+  font-size: 1rem;
+}
+
+.search-bar input {
+  flex: 2;
+}
+
+.search-bar select {
+  flex: 1;
+}
+
+.search-bar button {
+  padding: 10px 20px;
+}
+
+.search-results {
+  position: absolute;
+  top: 100px;
+  left: 20px;
+  width: 300px;
+  height: calc(100vh - 140px);
+  overflow-y: auto;
+  background-color: rgba(255, 255, 255, 0.95);
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.property-item {
+  border: 1px solid #ccc;
+  padding: 10px;
+  border-radius: 8px;
+  background-color: #f9f9f9;
+  position: relative;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.property-favorite-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 1px solid black;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: white;
+  cursor: pointer;
+}
+
+.map-placeholder {
+  width: 100%;
+  height: 500px;         /* 고정 높이 */
+  position: relative;    /* absolute → relative */
+  border: 2px solid red; /* 지도 박스 보이게 확인 */
+}
