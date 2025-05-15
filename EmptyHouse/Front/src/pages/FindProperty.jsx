@@ -16,40 +16,33 @@ function FindProperty() {
   const { properties, favorites, toggleFavorite } = useProperty();
 
   // ✅ Kakao 지도 생성
-useEffect(() => {
-  const script = document.createElement('script');
-  script.src = "https://dapi.kakao.com/v2/maps/sdk.js?appkey=28cfa7959f3cd4e4af75479d4c01d7b9&autoload=false";
-  script.async = true;
+  useEffect(() => {
+    const script = document.createElement('script');
+    script.src = "https://dapi.kakao.com/v2/maps/sdk.js?appkey=28cfa7959f3cd4e4af75479d4c01d7b9&autoload=false";
+    script.async = true;
 
-  script.onload = () => {
-    window.kakao.maps.load(() => {
-      const mapContainer = document.getElementById('map');
-      const options = {
-        center: new window.kakao.maps.LatLng(37.5665, 126.9780),
-        level: 3
-      };
-      new window.kakao.maps.Map(mapContainer, options);
-    });
-  };
+    script.onload = () => {
+      window.kakao.maps.load(() => {
+        const mapContainer = document.getElementById('map');
+        const options = {
+          center: new window.kakao.maps.LatLng(37.5665, 126.9780),
+          level: 3
+        };
+        new window.kakao.maps.Map(mapContainer, options);
+      });
+    };
 
-  document.head.appendChild(script);
-}, []);
+    document.head.appendChild(script);
+  }, []);
 
-
-  const handleSearchSubmit = () => {
-    setShowResults(true);
-  };
-
+  const handleSearchSubmit = () => setShowResults(true);
   const handleReset = () => {
     setSearchQuery('');
     setCategory('');
     setRegion('');
     setShowResults(false);
   };
-
-  const handleKeyDown = (e) => {
-    if (e.key === 'Enter') handleSearchSubmit();
-  };
+  const handleKeyDown = (e) => e.key === 'Enter' && handleSearchSubmit();
 
   const filtered = properties.filter((p) => {
     const matchesQuery = p.title.includes(searchQuery);
@@ -59,10 +52,7 @@ useEffect(() => {
   });
 
   return (
-    <div style={{ position: 'relative', width: '100%', height: '100vh' }}>
-      {/* 지도 영역 */}
-      <div id="map" className="map-placeholder"></div>
-
+    <div className="find-property-container">
       {/* 검색창 */}
       <div className="search-bar">
         <input
@@ -100,6 +90,9 @@ useEffect(() => {
         <button onClick={handleSearchSubmit}>검색</button>
         <button onClick={handleReset}>초기화</button>
       </div>
+
+      {/* 지도 */}
+      <div id="map" className="map-placeholder"></div>
 
       {/* 검색 결과 */}
       {showResults && (
