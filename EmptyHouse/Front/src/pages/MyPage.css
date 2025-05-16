@@ -1,25 +1,54 @@
 .mypage-container {
-  max-width: 800px;
+  padding: 30px;
+  max-width: 900px;
   margin: 0 auto;
-  padding: 40px 20px;
-  font-family: 'Noto Sans KR', sans-serif;
 }
 
 .mypage-title {
+  margin-bottom: 30px;
   text-align: center;
-  font-size: 2rem;
-  font-weight: bold;
+}
+
+.mypage-user-info {
   margin-bottom: 40px;
 }
 
-.mypage-section {
-  margin-bottom: 40px;
+.mypage-liked-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 20px;
 }
 
-.mypage-subtitle {
-  font-size: 1.25rem;
-  font-weight: bold;
-  margin-bottom: 15px;
+.mypage-card {
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  overflow: hidden;
+  background-color: #fafafa;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.mypage-card:hover {
+  transform: scale(1.02);
+}
+
+.mypage-card-img {
+  width: 100%;
+  height: 140px;
+  object-fit: cover;
+}
+
+.mypage-card-body {
+  padding: 10px;
+}
+
+.mypage-card-title {
+  margin: 0 0 10px 0;
+}
+
+.mypage-card-tags {
+  font-size: 14px;
+  color: #666;
 }
 
 .mypage-empty {
