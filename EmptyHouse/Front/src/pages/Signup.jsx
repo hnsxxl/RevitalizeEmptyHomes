@@ -34,12 +34,7 @@ function Signup() {
     const pwStatus = validatePassword(password);
 
     if (!pwStatus.isValid) {
-      setError('❌ 비밀번호는 8자리 이상이며 영문, 숫자, 특수문자를 모두 포함해야 합니다.');
-      return;
-    }
-
-    if (!passwordsMatch) {
-      setError('❌ 비밀번호가 일치하지 않습니다.');
+      alert('❌ 비밀번호는 8자리 이상이며 영문, 숫자, 특수문자를 모두 포함해야 합니다.');
       return;
     }
 
