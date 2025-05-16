@@ -1,0 +1,27 @@
+.mypage-container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 40px 20px;
+  font-family: 'Noto Sans KR', sans-serif;
+}
+
+.mypage-title {
+  text-align: center;
+  font-size: 2rem;
+  font-weight: bold;
+  margin-bottom: 40px;
+}
+
+.mypage-section {
+  margin-bottom: 40px;
+}
+
+.mypage-subtitle {
+  font-size: 1.25rem;
+  font-weight: bold;
+  margin-bottom: 15px;
+}
+
+.mypage-empty {
+  color: #888;
+}
