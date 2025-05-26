@@ -2,6 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from database import engine, Base
 from api.routes_auth import router as auth_router
+from api import routes_property
 
 app = FastAPI()
 
@@ -18,3 +19,4 @@ Base.metadata.create_all(bind=engine)
 
 # 라우터 등록
 app.include_router(auth_router)
+app.include_router(routes_property.router)
