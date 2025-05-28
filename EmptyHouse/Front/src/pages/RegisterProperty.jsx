@@ -25,11 +25,33 @@ function RegisterProperty() {
     setFormData({ ...formData, images: files });
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    console.log('제출된 데이터:', formData);
-    alert('매물 등록이 완료되었습니다!');
-  };
+  const handleSubmit = async (e) => {
+  e.preventDefault();
+
+  const data = new FormData();
+  data.append('name', formData.name);
+  data.append('contact', formData.contact);
+  data.append('email', formData.email);
+  data.append('address', formData.address);
+  data.append('area', formData.area);
+  data.append('yearBuilt', formData.yearBuilt);
+  data.append('floors', formData.floors);
+  data.append('usage', formData.usage);
+  data.append('touristSpots', formData.touristSpots);
+  formData.images.forEach((img, i) => data.append('file', img));
+
+  try {
+    const response = await fetch('http://localhost:8000/upload_image', {
+      method: 'POST',
+      body: data,
+    });
+    const result = await response.json();
+    console.log('서버 응답:', result);
+    alert('매물 등록이 완료되었습니다! 결과: ' + (result.result_path || '없음'));
+  } catch (error) {
+    alert('등록 중 오류 발생: ' + error.message);
+  }
+};
 
   return (
     <div className="register-container">
