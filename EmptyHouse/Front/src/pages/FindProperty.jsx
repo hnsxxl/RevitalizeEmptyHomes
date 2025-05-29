@@ -37,6 +37,7 @@ function FindProperty() {
   }, []);
 */
 
+/*
 useEffect(() => {
   const script = document.createElement('script');
   script.src = "https://dapi.kakao.com/v2/maps/sdk.js?appkey=28cfa7959f3cd4e4af75479d4c01d7b9&autoload=false";
@@ -69,6 +70,43 @@ useEffect(() => {
 
   document.head.appendChild(script);
 }, []);
+*/
+
+  // Kakao 지도 생성 + DB에서 핀 찍기
+  useEffect(() => {
+    const script = document.createElement('script');
+    script.src = "https://dapi.kakao.com/v2/maps/sdk.js?appkey=28cfa7959f3cd4e4af75479d4c01d7b9&autoload=false";
+    script.async = true;
+
+    script.onload = () => {
+      window.kakao.maps.load(() => {
+        const mapContainer = document.getElementById('map');
+        const options = {
+          center: new window.kakao.maps.LatLng(35.9675, 126.7365), // 군산 중심
+          level: 5,
+        };
+        const map = new window.kakao.maps.Map(mapContainer, options);
+
+        // DB에서 핀 정보 받아오기
+        fetch("http://localhost:8000/houses")
+          .then((res) => res.json())
+          .then((data) => {
+            // setHouses(data); // 혹시 나중에 검색/리스트에 활용할 수도 있으므로 저장
+
+            data.forEach((house) => {
+              new window.kakao.maps.Marker({
+                map: map,
+                position: new window.kakao.maps.LatLng(house.lat, house.lng),
+                title: house.address,
+              });
+            });
+          })
+          .catch((err) => console.error("지도 마커 불러오기 실패:", err));
+      });
+    };
+
+    document.head.appendChild(script);
+  }, []);
 
 
   const handleSearchSubmit = () => setShowResults(true);

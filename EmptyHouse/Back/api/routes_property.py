@@ -7,7 +7,7 @@ router = APIRouter()
 
 @router.get("/houses")
 def get_houses():
-    df = pd.read_csv("models/군산시_빈집데이터.csv", encoding="cp949")
+    df = pd.read_csv("data/군산빈집_latlng.csv", encoding="utf-8")
     results = []
 
     for _, row in df.iterrows():
