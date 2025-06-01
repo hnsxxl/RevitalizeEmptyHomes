@@ -27,7 +27,8 @@ function Signup() {
 
   const passwordsMatch = password && confirmPassword && password === confirmPassword;
 
-  const handleSignup = (e) => {
+  // ✨ fetch 사용해서 백엔드로 회원가입 정보 전송!
+  const handleSignup = async (e) => {
     e.preventDefault();
     setError('');
 
@@ -37,13 +38,32 @@ function Signup() {
       alert('❌ 비밀번호는 8자리 이상이며 영문, 숫자, 특수문자를 모두 포함해야 합니다.');
       return;
     }
+    if (password !== confirmPassword) {
+      alert('❌ 비밀번호가 일치하지 않습니다');
+      return;
+    }
 
-    // 회원가입 시 회원 정보 저장 -> 백 서버 연결 후 제거하기
-    localStorage.setItem('userEmail', email);
-    localStorage.setItem('userPassword', password);
+    try {
+      const response = await fetch('http://localhost:8000/signup', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: name,
+          email: email,
+          password: password,
+        }),
+      });
 
-    alert('회원가입이 완료되었습니다!');
-    navigate('/login');
+      if (response.ok) {
+        alert('회원가입이 완료되었습니다!');
+        navigate('/login');
+      } else {
+        const data = await response.json();
+        setError(data.detail || '회원가입 실패');
+      }
+    } catch (error) {
+      setError('서버 연결 실패: ' + error.message);
+    }
   };
 
   return (

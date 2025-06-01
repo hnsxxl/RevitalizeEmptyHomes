@@ -2,30 +2,35 @@ import shutil
 import os
 from fastapi import UploadFile
 import requests
+import zipfile
 
-
-
-def save_uploaded_file(upload_file: UploadFile, save_dir: str) -> str:
+def save_uploaded_file(upload_file, save_dir: str) -> str:
     os.makedirs(save_dir, exist_ok=True)
-    save_path = f"{save_dir}/{upload_file.filename}"
+    save_path = os.path.join(save_dir, upload_file.filename)
     with open(save_path, "wb") as buffer:
-        shutil.copyfileobj(upload_file.file, buffer)
+        buffer.write(upload_file.file.read())
     return save_path
 
-def send_to_colab(img_path):
-    colab_api_url = "https://3818-34-105-120-85.ngrok-free.app/process"
+def zip_folder(folder_path: str) -> str:
+    zip_path = folder_path + ".zip"
+    with zipfile.ZipFile(zip_path, 'w') as zipf:
+        for root, dirs, files in os.walk(folder_path):
+            for file in files:
+                abs_path = os.path.join(root, file)
+                rel_path = os.path.relpath(abs_path, folder_path)
+                zipf.write(abs_path, arcname=rel_path)
+    return zip_path
+
+def send_zip_to_colab(zip_path: str, email: str):
+    colab_api_url = "https://6600-34-125-19-8.ngrok-free.app/process" 
     try:
-        with open(img_path, "rb") as img_file:
-            files = {"file": img_file}
-            response = requests.post(colab_api_url, files=files, timeout=10)
+        with open(zip_path, "rb") as zip_file:
+            files = {"file": zip_file}
+            data = {"email": email}
+            response = requests.post(colab_api_url, files=files, data=data, timeout=60)
         print("Colab 응답 status:", response.status_code)
-        print("Colab 응답 내용:", response.headers)
-
-        os.makedirs("results", exist_ok=True)
-
-        with open("results/result.jpg", "wb") as f:
-            f.write(response.content)
-        return "results/result.jpg"
+        print("Colab 응답 내용:", response.text)
+        return response
     except Exception as e:
         print("Colab 전송 중 에러 발생:", e)
         return None

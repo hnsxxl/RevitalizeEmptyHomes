@@ -29,6 +29,8 @@ function RegisterProperty() {
   e.preventDefault();
 
   const data = new FormData();
+  const userEmail = localStorage.getItem('userEmail'); 
+  data.append('email', userEmail);
   data.append('name', formData.name);
   data.append('contact', formData.contact);
   data.append('email', formData.email);
@@ -38,10 +40,10 @@ function RegisterProperty() {
   data.append('floors', formData.floors);
   data.append('usage', formData.usage);
   data.append('touristSpots', formData.touristSpots);
-  formData.images.forEach((img, i) => data.append('file', img));
+  formData.images.forEach((img, i) => data.append('files', img));
 
   try {
-    const response = await fetch('http://localhost:8000/upload_image', {
+    const response = await fetch('http://localhost:8000/upload_images', {
       method: 'POST',
       body: data,
     });
