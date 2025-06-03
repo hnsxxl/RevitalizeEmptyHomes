@@ -1,17 +1,23 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Link } from 'react-router-dom';
-import { useProperty } from '../contexts/PropertyContext';
 import './Home.css';
 
 function Home() {
   const navigate = useNavigate();
-  const { properties } = useProperty();
+  const [publicJobs, setPublicJobs] = useState([]);
   const [currentSlide, setCurrentSlide] = useState(0);
 
+  // --- 공개된 작업 가져오기 ---
+  useEffect(() => {
+    fetch("http://localhost:8000/published_jobs")
+      .then(res => res.json())
+      .then(setPublicJobs)
+      .catch(console.error);
+  }, []);
+
   const itemsPerSlide = 4;
-  const totalSlides = Math.ceil(properties.length / itemsPerSlide);
-  const visibleProperties = properties.slice(
+  const totalSlides = Math.ceil(publicJobs.length / itemsPerSlide);
+  const visibleProperties = publicJobs.slice(
     currentSlide * itemsPerSlide,
     currentSlide * itemsPerSlide + itemsPerSlide
   );
@@ -21,7 +27,7 @@ function Home() {
   };
 
   const handleNext = () => {
-    if ((currentSlide + 1) * itemsPerSlide < properties.length) {
+    if ((currentSlide + 1) * itemsPerSlide < publicJobs.length) {
       setCurrentSlide(currentSlide + 1);
     }
   };
@@ -31,8 +37,7 @@ function Home() {
       <section className="home-header">
         <div className="nav-links">
           <h1 className="site-title">빈집찾기</h1>
-          <Link to="/find-property" className="link-find">매물찾기</Link>
-          <Link to="/register-property" className="link-register">매도의뢰</Link>
+          {/* ... */}
         </div>
       </section>
 
@@ -41,7 +46,7 @@ function Home() {
       </section>
 
       <section className="recommend-section" style={{ textAlign: "center" }}>
-        <h2>추천 매물</h2>
+        <h2>추천 매물 (공개된 가우시안 모델!)</h2>
         <div style={{ display: "flex", justifyContent: "center", position: "relative", marginTop: "20px" }}>
           <div style={{
             display: "grid",
@@ -51,43 +56,44 @@ function Home() {
             margin: "0 auto",
             position: "relative"
           }}>
-            {visibleProperties.map(property => (
+            {visibleProperties.map(job => (
               <div
-                key={property.id}
-                onClick={() => navigate(`/detail/${property.id}`)}
+                key={job.id}
+                onClick={() => navigate(`/detail/${job.id}`)}
                 style={{
-                  width: "250px",
-                  height: "300px",
-                  background: "#fff",
-                  borderRadius: "10px",
-                  boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
-                  overflow: "hidden",
-                  cursor: "pointer",
-                  flexShrink: 0,
+                  width: "250px", height: "300px", background: "#fff",
+                  borderRadius: "10px", boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+                  overflow: "hidden", cursor: "pointer", flexShrink: 0,
                   transition: "transform 0.3s",
                 }}
-                onMouseEnter={(e) => e.currentTarget.style.transform = "scale(1.05)"}
-                onMouseLeave={(e) => e.currentTarget.style.transform = "scale(1)"}
+                onMouseEnter={e => e.currentTarget.style.transform = "scale(1.05)"}
+                onMouseLeave={e => e.currentTarget.style.transform = "scale(1)"}
               >
-                <img src={property.image} alt="빈집" style={{ width: "100%", height: "200px", objectFit: "cover" }} />
+                <img
+                  src={job.image}
+                  alt="가우시안 3D 결과"
+                  style={{ width: "100%", height: "200px", objectFit: "cover" }}
+                  onError={e => {
+                    if (!e.target._errored) {
+                      e.target.src = "/noimage.png";
+                      e.target._errored = true;
+                    }
+                  }}
+                />
                 <div style={{ padding: "10px" }}>
-                  <h4>{property.title}</h4>
-                  <p style={{ fontSize: "0.8rem", color: "#666" }}>#{property.tags.join(' #')}</p>
+                  <h4>{job.title}</h4>
+                  <p style={{ fontSize: "0.8rem", color: "#666" }}>
+                    #{job.tags && job.tags.join(' #')}
+                  </p>
+                  <div style={{ color: "#3377ee", fontSize: 13 }}>{job.created_at}</div>
                 </div>
               </div>
             ))}
           </div>
-
-          {properties.length > itemsPerSlide && currentSlide > 0 && (
-            <button className="arrow-btn left" onClick={handlePrev}>◀</button>
-          )}
-          {properties.length > itemsPerSlide && currentSlide < totalSlides - 1 && (
-            <button className="arrow-btn right" onClick={handleNext}>▶</button>
-          )}
+          {/* ...이하 생략... */}
         </div>
       </section>
     </div>
   );
 }
-
 export default Home;

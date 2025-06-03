@@ -8,7 +8,7 @@ function Login() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const navigate = useNavigate();
-  const { setIsLoggedIn } = useAuth();
+  const { setIsLoggedIn, setUser } = useAuth();  // ★ setUser 추가!
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -30,11 +30,17 @@ function Login() {
         return;
       }
 
-      await response.json();
+      // ✅ 로그인 성공시 받은 user 정보 활용!
+      const data = await response.json();
+
       setIsLoggedIn(true);
-      // 원하는대로 localStorage 등에 저장 가능 (아래 예시)
-      localStorage.setItem('userEmail', email);
-      navigate('/'); // 로그인 후 메인페이지 등 원하는 곳으로 이동
+      setUser({
+        email: data.email,
+        //name: data.name,         // 백엔드에서 name 없으면 undefined 가능
+        //user_id: data.user_id,   // 필요시 추가
+      });
+
+      navigate('/'); // 원하는 경로로 이동
 
     } catch (err) {
       setError('서버 연결 실패: ' + err.message);

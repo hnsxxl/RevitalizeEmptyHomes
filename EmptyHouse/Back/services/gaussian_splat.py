@@ -21,13 +21,14 @@ def zip_folder(folder_path: str) -> str:
                 zipf.write(abs_path, arcname=rel_path)
     return zip_path
 
-def send_zip_to_colab(zip_path: str, email: str):
-    colab_api_url = "https://6600-34-125-19-8.ngrok-free.app/process" 
+def send_zip_to_colab(zip_path: str, email: str, job_uuid: str):
+    colab_api_url = "https://01cd-34-125-203-53.ngrok-free.app/process" 
     try:
         with open(zip_path, "rb") as zip_file:
             files = {"file": zip_file}
-            data = {"email": email}
-            response = requests.post(colab_api_url, files=files, data=data, timeout=60)
+            # 👇 email과 job_uuid 둘 다 반드시 포함!
+            data = {"email": email, "job_uuid": job_uuid}
+            response = requests.post(colab_api_url, files=files, data=data, timeout=120)
         print("Colab 응답 status:", response.status_code)
         print("Colab 응답 내용:", response.text)
         return response

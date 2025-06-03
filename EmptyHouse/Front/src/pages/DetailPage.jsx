@@ -1,82 +1,93 @@
-import React from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
-import { FaHeart, FaRegHeart, FaShareAlt, FaPhone } from 'react-icons/fa';
-import { useAuth } from '../contexts/AuthContext';
-import { useProperty } from '../contexts/PropertyContext';
-import './DetailPage.css'; 
+import { useEffect, useState } from 'react';
+import { useParams, useNavigate } from "react-router-dom";
+
+function getLikedJobs() {
+  return JSON.parse(localStorage.getItem('liked3dJobs') || "[]");
+}
+function setLikedJobs(list) {
+  localStorage.setItem('liked3dJobs', JSON.stringify(list));
+}
 
 function DetailPage() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { isLoggedIn } = useAuth();
-  const { properties, favorites, toggleFavorite } = useProperty();
+  const [job, setJob] = useState(null);
+  const [liked, setLiked] = useState(false);
 
-  const property = properties.find(p => p.id === Number(id));
+  useEffect(() => {
+    fetch("http://localhost:8000/published_jobs")
+      .then(res => res.json())
+      .then(jobs => {
+        const found = jobs.find(j => String(j.id) === String(id));
+        setJob(found || null);
+      });
+    setLiked(getLikedJobs().includes(String(id)));
+  }, [id]);
 
-  if (!property) {
-    return <div style={{ padding: '20px' }}>해당 매물을 찾을 수 없습니다.</div>;
+  function handleLike() {
+    let likedList = getLikedJobs();
+    if (likedList.includes(String(id))) {
+      likedList = likedList.filter(jid => jid !== String(id));
+    } else {
+      likedList.push(String(id));
+    }
+    setLikedJobs(likedList);
+    setLiked(likedList.includes(String(id)));
   }
 
-  const liked = favorites.includes(property.id);
-
-  const handleLike = () => {
-    if (!isLoggedIn) {
-      alert("로그인이 필요한 기능입니다.");
-      navigate('/login');
-      return;
-    }
-    toggleFavorite(property.id);
-  };
-
-  const handleShare = () => {
-    navigator.clipboard.writeText(window.location.href);
-    alert("링크가 복사되었습니다!");
-  };
-
-  const handleCall = () => {
-    window.location.href = `tel:${property.문의전화 || '063-000-0000'}`;
-  };
+  if (!job) return <div style={{ padding: '20px' }}>해당 매물을 찾을 수 없습니다.</div>;
 
   return (
-    <>
-      <div className="detail-header">
-        <h2 className="detail-heading">매물 찾기</h2>
-        <hr className="detail-divider" />
+    <div style={{ padding: '40px', maxWidth: 1200, margin: '0 auto', display: 'flex', gap: 32 }}>
+      {/* 왼쪽 3D Supersplat */}
+      <div style={{ flex: 2 }}>
+        <h2 style={{ fontWeight: 600, marginBottom: 16 }}>3D 미리보기</h2>
+        <iframe
+          src={`http://localhost:7033/?file=${encodeURIComponent(job.image)}`}
+          title="supersplat"
+          width="100%"
+          height="540"
+          style={{ border: "2px solid #bcd", borderRadius: 18, background: "#222" }}
+          allowFullScreen
+        />
       </div>
 
-      <div className="detail-container">
-        <div className="detail-left">
-          <div className="detail-3d-view">
-            (여기에 3D 뷰 자리)
-          </div>
+      {/* 오른쪽 정보 */}
+      <div style={{ flex: 1, background: "#fafaff", borderRadius: 18, boxShadow: "0 2px 18px #ccd3", padding: 28 }}>
+        <h2>{job.title}</h2>
+        <div style={{ margin: "18px 0", color: "#225", fontWeight: 500 }}>
+          {job.tags && job.tags.map((tag, i) => (
+            <span key={i} style={{
+              display: "inline-block", background: "#dde6ff", color: "#256",
+              fontSize: 13, padding: "4px 12px", borderRadius: 12, marginRight: 6
+            }}>#{tag}</span>
+          ))}
         </div>
-
-        <div className="detail-right">
-          <h1 className="detail-title">{property.title}</h1>
-
-          <div className="detail-tags">
-            {property.tags && property.tags.map((tag, i) => (
-              <div key={i}>• {tag}</div>
-            ))}
-          </div>
-
-          <div className="detail-buttons">
-            <button onClick={handleLike} className="detail-button">
-              {liked ? <FaHeart color="red" size={24} /> : <FaRegHeart size={24} />}
-            </button>
-
-            <button onClick={handleShare} className="detail-button">
-              <FaShareAlt size={24} />
-            </button>
-
-            <button onClick={handleCall} className="detail-button">
-              <FaPhone size={24} />
-            </button>
-          </div>
+        <div style={{ color: "#888", marginBottom: 10 }}>등록일: {job.created_at}</div>
+        <div style={{ color: "#115", marginBottom: 10, fontWeight: 500 }}>상태: {job.status}</div>
+        <button
+          onClick={() => window.open(job.image, "_blank")}
+          style={{
+            background: "#3477ef", color: "#fff", border: "none",
+            borderRadius: 7, padding: "9px 20px", fontWeight: 700, fontSize: 16,
+            cursor: "pointer", marginTop: 12
+          }}
+        >
+          3D 결과 파일 다운로드
+        </button>
+        {/* 찜 버튼 */}
+        <button
+          onClick={handleLike}
+          style={{
+            marginLeft: 20, fontSize: 16, padding: "8px 18px", borderRadius: 8,
+            background: liked ? "#ff6f91" : "#eee", color: liked ? "#fff" : "#444", fontWeight: 600, border: "none", cursor: "pointer"
+          }}
+        >{liked ? "❤️ 찜 완료" : "🤍 찜하기"}</button>
+        <div style={{ marginTop: 30, color: "#bbb", fontSize: 13 }}>
+          ※ 본 데이터는 사용자 공개로 게시되었습니다.
         </div>
       </div>
-    </>
+    </div>
   );
 }
-
 export default DetailPage;

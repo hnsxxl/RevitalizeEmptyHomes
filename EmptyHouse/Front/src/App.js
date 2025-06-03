@@ -7,6 +7,7 @@ import RegisterProperty from './pages/RegisterProperty';
 import MyPage from './pages/MyPage';
 import DetailPage from './pages/DetailPage';
 import Layout from './components/Layout';
+import JobDetail from './pages/JobDetail';
 import { AuthProvider } from './contexts/AuthContext'; // ✅ 추가
 
 function App() {
@@ -22,6 +23,7 @@ function App() {
             <Route path="/register-property" element={<RegisterProperty />} />
             <Route path="/mypage" element={<MyPage />} />
             <Route path="/detail/:id" element={<DetailPage />} />
+            <Route path="/job/:job_uuid" element={<JobDetail />} />
           </Routes>
         </Layout>
       </Router>
