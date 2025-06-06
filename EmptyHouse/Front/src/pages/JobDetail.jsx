@@ -4,7 +4,7 @@ import { useParams } from 'react-router-dom';
 function JobDetail() {
   const { job_uuid } = useParams();
   const [job, setJob] = useState(null);
-  const [supersplatUrl, setSupersplatUrl] = useState("http://localhost:7033/");
+  const [supersplatUrl, setSupersplatUrl] = useState("http://localhost:52928/");
   const dragRef = useRef();
 
   useEffect(() => {
@@ -13,7 +13,7 @@ function JobDetail() {
         if (!res.ok) throw new Error('작업을 찾을 수 없습니다.');
         return res.json();
       })
-      .then(setJob)
+      .then(setJob) 
       .catch(() => setJob(null));
   }, [job_uuid]);
 
@@ -41,7 +41,7 @@ function JobDetail() {
   function handleSupersplatBlockClick() {
     if (supersplatFileUrl) {
       setSupersplatUrl(
-        `http://localhost:7033/?file=${encodeURIComponent(supersplatFileUrl)}&ts=${Date.now()}`
+        `http://localhost:52928/?file=${encodeURIComponent(supersplatFileUrl)}&ts=${Date.now()}`
       );
     }
   }

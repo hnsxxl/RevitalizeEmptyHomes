@@ -34,12 +34,7 @@ function Home() {
 
   return (
     <div className="home-container">
-      <section className="home-header">
-        <div className="nav-links">
-          <h1 className="site-title">빈집찾기</h1>
-          {/* ... */}
-        </div>
-      </section>
+  
 
       <section style={{ background: "#f0f0f0", height: "300px", marginBottom: "50px" }}>
         <h2 style={{ textAlign: "center", lineHeight: "300px" }}>사이트 소개 사진 자리</h2>

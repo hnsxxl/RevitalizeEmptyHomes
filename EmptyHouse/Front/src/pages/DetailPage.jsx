@@ -41,9 +41,9 @@ function DetailPage() {
     <div style={{ padding: '40px', maxWidth: 1200, margin: '0 auto', display: 'flex', gap: 32 }}>
       {/* 왼쪽 3D Supersplat */}
       <div style={{ flex: 2 }}>
-        <h2 style={{ fontWeight: 600, marginBottom: 16 }}>3D 미리보기</h2>
+        <h2 style={{ fontWeight: 600, marginBottom: 16 }}> 빈집 미리보기</h2>
         <iframe
-          src={`http://localhost:7033/?file=${encodeURIComponent(job.image)}`}
+          src={`http://localhost:52928/?file=${encodeURIComponent(job.image)}`}
           title="supersplat"
           width="100%"
           height="540"
