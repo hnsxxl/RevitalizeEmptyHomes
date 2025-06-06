@@ -75,3 +75,19 @@
 .auth-link:hover {
   text-decoration: none;
 }
+
+.nav-menu {
+  display: flex;
+  gap: 30px;
+}
+
+.nav-link {
+  text-decoration: none;
+  color: gray;
+  font-size: 1.1rem;
+  font-weight: bold;
+}
+
+.nav-link:hover {
+  color: #007bff;
+}

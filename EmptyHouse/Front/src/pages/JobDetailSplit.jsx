@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 function JobDetailSplit({ userEmail, initialJobUuid, jobs: propJobs, onClose }) {
   const [jobs, setJobs] = useState(propJobs || []);
   const [selectedJob, setSelectedJob] = useState(null);
-  const [supersplatUrl, setSupersplatUrl] = useState("http://localhost:7033/");
+  const [supersplatUrl, setSupersplatUrl] = useState("http://localhost:52928/");
   const [publishLoading, setPublishLoading] = useState(null);
 
   // propJobs로 올 때는 fetch 안 해도 됨!
@@ -24,7 +24,7 @@ function JobDetailSplit({ userEmail, initialJobUuid, jobs: propJobs, onClose }) 
       setSelectedJob(initialJob);
       if (initialJob?.result_path) {
         setSupersplatUrl(
-          `http://localhost:7033/?file=${encodeURIComponent(
+          `http://localhost:52928/?file=${encodeURIComponent(
             `http://localhost:8000/outputs_download/${initialJob.result_path.replace(/^outputs[\\/]+/, '')}`
           )}&ts=${Date.now()}`
         );
@@ -36,7 +36,7 @@ function JobDetailSplit({ userEmail, initialJobUuid, jobs: propJobs, onClose }) 
     setSelectedJob(job);
     if (job?.result_path) {
       setSupersplatUrl(
-        `http://localhost:7033/?file=${encodeURIComponent(
+        `http://localhost:52928/?file=${encodeURIComponent(
           `http://localhost:8000/outputs_download/${job.result_path.replace(/^outputs[\\/]+/, '')}`
         )}&ts=${Date.now()}`
       );

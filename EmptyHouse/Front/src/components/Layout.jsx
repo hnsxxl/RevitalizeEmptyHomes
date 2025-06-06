@@ -19,6 +19,11 @@ function Layout({ children }) {
           <span className="logo-text">머무름</span>
         </Link>
 
+        <div className="nav-menu">
+          <Link to="/find-property" className="nav-link">빈집찾기</Link>
+          <Link to="/register-property" className="nav-link">빈집의뢰</Link>
+        </div>
+
         <div className="nav-right">
           {isLoggedIn ? (
             <>

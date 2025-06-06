@@ -22,7 +22,7 @@ def zip_folder(folder_path: str) -> str:
     return zip_path
 
 def send_zip_to_colab(zip_path: str, email: str, job_uuid: str):
-    colab_api_url = "https://01cd-34-125-203-53.ngrok-free.app/process" 
+    colab_api_url = "https://e122-34-125-216-72.ngrok-free.app/process" 
     try:
         with open(zip_path, "rb") as zip_file:
             files = {"file": zip_file}
