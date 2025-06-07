@@ -11,12 +11,12 @@ function FindProperty() {
   const [category, setCategory] = useState('');
   const [region, setRegion] = useState('');
   const [showResults, setShowResults] = useState(false);
+  const [houses, setHouses] = useState([]);
 
   const { isLoggedIn } = useAuth();
   const { properties, favorites, toggleFavorite } = useProperty();
 
-/*
-  // ✅ Kakao 지도 생성
+  // 지도 생성 및 빈집 데이터 fetch
   useEffect(() => {
     const script = document.createElement('script');
     script.src = "https://dapi.kakao.com/v2/maps/sdk.js?appkey=28cfa7959f3cd4e4af75479d4c01d7b9&autoload=false";
@@ -26,115 +26,80 @@ function FindProperty() {
       window.kakao.maps.load(() => {
         const mapContainer = document.getElementById('map');
         const options = {
-          center: new window.kakao.maps.LatLng(37.5665, 126.9780),
-          level: 3
-        };
-        new window.kakao.maps.Map(mapContainer, options);
-      });
-    };
-
-    document.head.appendChild(script);
-  }, []);
-*/
-
-/*
-useEffect(() => {
-  const script = document.createElement('script');
-  script.src = "https://dapi.kakao.com/v2/maps/sdk.js?appkey=28cfa7959f3cd4e4af75479d4c01d7b9&autoload=false";
-  script.async = true;
-
-  script.onload = () => {
-    window.kakao.maps.load(() => {
-      const mapContainer = document.getElementById('map');
-      const options = {
-        center: new window.kakao.maps.LatLng(35.9675, 126.7365), // 군산
-        level: 5,
-      };
-      const map = new window.kakao.maps.Map(mapContainer, options);
-
-      // 🔽 여기서 API 호출하고 마커 찍기
-      fetch("http://localhost:8000/houses")
-        .then((res) => res.json())
-        .then((data) => {
-          data.forEach((house) => {
-            new window.kakao.maps.Marker({
-              map: map,
-              position: new window.kakao.maps.LatLng(house.lat, house.lng),
-              title: house.address,
-            });
-          });
-        })
-        .catch((err) => console.error("지도 마커 불러오기 실패:", err));
-    });
-  };
-
-  document.head.appendChild(script);
-}, []);
-*/
-
-  // Kakao 지도 생성 + DB에서 핀 찍기
-  useEffect(() => {
-    const script = document.createElement('script');
-    script.src = "https://dapi.kakao.com/v2/maps/sdk.js?appkey=28cfa7959f3cd4e4af75479d4c01d7b9&autoload=false";
-    script.async = true;
-
-    script.onload = () => {
-      window.kakao.maps.load(() => {
-        const mapContainer = document.getElementById('map');
-        const options = {
-          center: new window.kakao.maps.LatLng(35.9675, 126.7365), // 군산 중심
+          center: new window.kakao.maps.LatLng(35.8460944271824, 127.13438887464724),
           level: 5,
         };
         const map = new window.kakao.maps.Map(mapContainer, options);
+        window.customMap = map;
 
-        // DB에서 핀 정보 받아오기
         fetch("http://localhost:8000/houses")
           .then((res) => res.json())
-          .then((data) => {
-            // setHouses(data); // 혹시 나중에 검색/리스트에 활용할 수도 있으므로 저장
-
-            data.forEach((house) => {
-              new window.kakao.maps.Marker({
-                map: map,
-                position: new window.kakao.maps.LatLng(house.lat, house.lng),
-                title: house.address,
-              });
-            });
-          })
-          .catch((err) => console.error("지도 마커 불러오기 실패:", err));
+          .then((data) => setHouses(data))
+          .catch((err) => console.error("빈집 데이터 불러오기 실패:", err));
       });
     };
 
     document.head.appendChild(script);
   }, []);
 
+  const handleSearchSubmit = () => {
+    setShowResults(true);
 
-  const handleSearchSubmit = () => setShowResults(true);
+    // 기존 마커 제거
+    if (window.searchMarkers) {
+      window.searchMarkers.forEach(marker => marker.setMap(null));
+    }
+
+    const map = window.customMap;
+    const query = searchQuery.toLowerCase();
+    const regionQuery = region.toLowerCase();
+
+    const matched = houses.filter((h) => {
+      const addr = h.address?.toLowerCase() || '';
+      const matchesQuery = query ? addr.includes(query) : true;
+      const matchesCategory = category ? h.type?.includes(category) : true;
+      const matchesRegion = region ? (
+        addr.includes(regionQuery)
+      ) : true;
+      return matchesQuery && matchesCategory && matchesRegion;
+    });
+
+    const markers = matched.map((house) =>
+      new window.kakao.maps.Marker({
+        map: map,
+        position: new window.kakao.maps.LatLng(house.lat, house.lng),
+        title: house.address,
+      })
+    );
+    window.searchMarkers = markers;
+  };
+
   const handleReset = () => {
     setSearchQuery('');
     setCategory('');
     setRegion('');
     setShowResults(false);
-  };
-  const handleKeyDown = (e) => e.key === 'Enter' && handleSearchSubmit();
 
-  const filtered = properties.filter((p) => {
-    const matchesQuery = p.title.includes(searchQuery);
-    const matchesCategory = category ? p.tags.includes(category) : true;
-    const matchesRegion = region ? p.region === region : true;
-    return matchesQuery && matchesCategory && matchesRegion;
-  });
+    // 마커 제거
+    if (window.searchMarkers) {
+      window.searchMarkers.forEach(marker => marker.setMap(null));
+      window.searchMarkers = [];
+    }
+  };
+
+  const handleKeyDown = (e) => e.key === 'Enter' && handleSearchSubmit();
 
   return (
     <div className="find-property-container">
-      {/* 검색창 */}
+      <h2>빈집 지도</h2>
+
       <div className="search-bar">
         <input
           type="text"
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           onKeyDown={handleKeyDown}
-          placeholder="검색어를 입력하세요 (예: 지역명, 관광지)"
+          placeholder="검색어를 입력하세요 (예: 군산, 월명동)"
         />
         <select value={category} onChange={(e) => setCategory(e.target.value)}>
           <option value="">용도 선택</option>
@@ -165,44 +130,22 @@ useEffect(() => {
         <button onClick={handleReset}>초기화</button>
       </div>
 
-      {/* 지도 */}
       <div id="map" className="map-placeholder"></div>
 
-      {/* 검색 결과 */}
       {showResults && (
         <div className="search-results">
           <h2>검색 결과</h2>
-          {filtered.length > 0 ? (
-            filtered.map((property) => (
-              <div
-                key={property.id}
-                className="property-item"
-                onClick={() => navigate(`/detail/${property.id}`)}
-              >
-                <div>
-                  <h3>{property.title}</h3>
-                  <p>#{property.tags.join(' #')}</p>
+          {houses.filter((h) => h.address?.toLowerCase().includes(searchQuery.toLowerCase())).length > 0 ? (
+            houses
+              .filter((h) => h.address?.toLowerCase().includes(searchQuery.toLowerCase()))
+              .map((property, i) => (
+                <div key={i} className="property-item">
+                  <div>
+                    <h3>{property.address}</h3>
+                    <p>연면적: {property.area}㎡</p>
+                  </div>
                 </div>
-                <button
-                  className="property-favorite-btn"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    if (!isLoggedIn) {
-                      alert('로그인이 필요한 기능입니다.');
-                      navigate('/login');
-                      return;
-                    }
-                    toggleFavorite(property.id);
-                  }}
-                >
-                  {favorites.includes(property.id) ? (
-                    <FaHeart color="red" size={20} />
-                  ) : (
-                    <FaRegHeart size={20} />
-                  )}
-                </button>
-              </div>
-            ))
+              ))
           ) : (
             <p>검색 결과가 없습니다.</p>
           )}
