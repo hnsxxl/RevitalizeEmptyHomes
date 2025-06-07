@@ -43,36 +43,44 @@ function FindProperty() {
   }, []);
 
   const handleSearchSubmit = () => {
-    setShowResults(true);
+  setShowResults(true);
 
-    // 기존 마커 제거
-    if (window.searchMarkers) {
-      window.searchMarkers.forEach(marker => marker.setMap(null));
-    }
+  if (window.searchMarkers) {
+    window.searchMarkers.forEach(marker => marker.setMap(null));
+  }
 
-    const map = window.customMap;
-    const query = searchQuery.toLowerCase();
-    const regionQuery = region.toLowerCase();
+  const map = window.customMap;
+  const query = searchQuery.toLowerCase();
+  const regionQuery = region.toLowerCase();
 
-    const matched = houses.filter((h) => {
-      const addr = h.address?.toLowerCase() || '';
-      const matchesQuery = query ? addr.includes(query) : true;
-      const matchesCategory = category ? h.type?.includes(category) : true;
-      const matchesRegion = region ? (
-        addr.includes(regionQuery)
-      ) : true;
-      return matchesQuery && matchesCategory && matchesRegion;
+  const matched = houses.filter((h) => {
+    const addr = h.address?.toLowerCase() || '';
+    const matchesQuery = query ? addr.includes(query) : true;
+    const matchesCategory = category ? h.type?.includes(category) : true;
+    const matchesRegion = region ? (
+      addr.includes(regionQuery)
+    ) : true;
+    return matchesQuery && matchesCategory && matchesRegion;
+  });
+
+  const bounds = new window.kakao.maps.LatLngBounds(); // 범위 객체 생성
+
+  const markers = matched.map((house) => {
+    const position = new window.kakao.maps.LatLng(house.lat, house.lng);
+    bounds.extend(position); // 범위 확장
+    return new window.kakao.maps.Marker({
+      map: map,
+      position: position,
+      title: house.address,
     });
+  });
 
-    const markers = matched.map((house) =>
-      new window.kakao.maps.Marker({
-        map: map,
-        position: new window.kakao.maps.LatLng(house.lat, house.lng),
-        title: house.address,
-      })
-    );
-    window.searchMarkers = markers;
-  };
+  if (matched.length > 0) {
+    map.setBounds(bounds); // 마커 전체 포함되도록 지도 이동
+  }
+
+  window.searchMarkers = markers;
+};
 
   const handleReset = () => {
     setSearchQuery('');
