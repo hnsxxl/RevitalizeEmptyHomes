@@ -29,6 +29,8 @@ async def lifespan(app: FastAPI):
         df = pd.read_csv("data/군산빈집_latlng.csv")
         df = df.rename(columns={"위도": "lat", "경도": "lng", "전체주소": "address"})
         
+        df["id"] = df.index.astype(str)  # 고유 id
+        
         df["lat"] = pd.to_numeric(df["lat"], errors="coerce")
         df["lng"] = pd.to_numeric(df["lng"], errors="coerce")
         df = df.dropna(subset=["lat", "lng"])
@@ -296,6 +298,13 @@ def published_jobs():
 @app.get("/houses")
 def get_houses():
     return cached_house_data
+
+@app.get("/house_detail/{house_id}")
+def get_house_detail(house_id: str):
+    for h in cached_house_data:
+        if str(h.get("id")) == house_id:
+            return h
+    raise HTTPException(status_code=404, detail="해당 빈집을 찾을 수 없습니다.")
 
 
 # DB 테이블 생성
