@@ -16,8 +16,33 @@ from routes import house
 from sqlalchemy import text, Boolean
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
+from contextlib import asynccontextmanager
+import pandas as pd
 
-app = FastAPI()
+# --- 서버 시작 시 빈집 데이터 캐시 ---
+cached_house_data = []
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    global cached_house_data
+    try:
+        df = pd.read_csv("data/군산빈집_latlng.csv")
+        df = df.rename(columns={"위도": "lat", "경도": "lng", "전체주소": "address"})
+        
+        df["lat"] = pd.to_numeric(df["lat"], errors="coerce")
+        df["lng"] = pd.to_numeric(df["lng"], errors="coerce")
+        df = df.dropna(subset=["lat", "lng"])
+        
+        df = df.fillna("")
+        cached_house_data = df.to_dict(orient="records")
+        print(f"빈집 데이터 {len(cached_house_data)}건 캐싱 완료")
+    except Exception as e:
+        print(f"빈집 데이터 로딩 실패: {e}")
+    
+    yield  # 애플리케이션 실행 유지
+
+#  lifespan 핸들러를 적용한 FastAPI 인스턴스 생성
+app = FastAPI(lifespan=lifespan)
 
 app.add_middleware(
     CORSMiddleware,
@@ -267,6 +292,10 @@ def published_jobs():
         ]
     finally:
         db.close()
+        
+@app.get("/houses")
+def get_houses():
+    return cached_house_data
 
 
 # DB 테이블 생성
