@@ -106,7 +106,7 @@ function MyPage() {
 
       {/* 3D 공개 찜 매물 */}
       <div className="mypage-liked">
-        <h2>찜한 모델</h2>
+        <h2>찜한 매물</h2>
         {liked3dJobs.length === 0 ? (
           <p className="mypage-empty">찜한 모델이 없습니다.</p>
         ) : (
