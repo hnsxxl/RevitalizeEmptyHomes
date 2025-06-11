@@ -5,6 +5,8 @@ import { useAuth } from '../contexts/AuthContext';
 import { useProperty } from '../contexts/PropertyContext';
 import './FindProperty.css';
 
+
+
 function FindProperty() {
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState('');
@@ -16,7 +18,6 @@ function FindProperty() {
   const { isLoggedIn } = useAuth();
   const { properties, favorites, toggleFavorite } = useProperty();
 
-  // 지도 생성 및 빈집 데이터 fetch
   useEffect(() => {
     const script = document.createElement('script');
     script.src = "https://dapi.kakao.com/v2/maps/sdk.js?appkey=28cfa7959f3cd4e4af75479d4c01d7b9&autoload=false";
@@ -43,44 +44,43 @@ function FindProperty() {
   }, []);
 
   const handleSearchSubmit = () => {
-  setShowResults(true);
+    setShowResults(true);
+    
 
-  if (window.searchMarkers) {
-    window.searchMarkers.forEach(marker => marker.setMap(null));
-  }
+    if (window.searchMarkers) {
+      window.searchMarkers.forEach(marker => marker.setMap(null));
+    }
 
-  const map = window.customMap;
-  const query = searchQuery.toLowerCase();
-  const regionQuery = region.toLowerCase();
+    const map = window.customMap;
+    const query = searchQuery.toLowerCase();
+    const regionQuery = region.toLowerCase();
 
-  const matched = houses.filter((h) => {
-    const addr = h.address?.toLowerCase() || '';
-    const matchesQuery = query ? addr.includes(query) : true;
-    const matchesCategory = category ? h.type?.includes(category) : true;
-    const matchesRegion = region ? (
-      addr.includes(regionQuery)
-    ) : true;
-    return matchesQuery && matchesCategory && matchesRegion;
-  });
-
-  const bounds = new window.kakao.maps.LatLngBounds(); // 범위 객체 생성
-
-  const markers = matched.map((house) => {
-    const position = new window.kakao.maps.LatLng(house.lat, house.lng);
-    bounds.extend(position); // 범위 확장
-    return new window.kakao.maps.Marker({
-      map: map,
-      position: position,
-      title: house.address,
+    const matched = houses.filter((h) => {
+      const addr = h.address?.toLowerCase() || '';
+      const matchesQuery = query ? addr.includes(query) : true;
+      const matchesCategory = category ? h.type?.includes(category) : true;
+      const matchesRegion = region ? addr.includes(regionQuery) : true;
+      return matchesQuery && matchesCategory && matchesRegion;
     });
-  });
 
-  if (matched.length > 0) {
-    map.setBounds(bounds); // 마커 전체 포함되도록 지도 이동
-  }
+    const bounds = new window.kakao.maps.LatLngBounds();
 
-  window.searchMarkers = markers;
-};
+    const markers = matched.map((house) => {
+      const position = new window.kakao.maps.LatLng(house.lat, house.lng);
+      bounds.extend(position);
+      return new window.kakao.maps.Marker({
+        map: map,
+        position: position,
+        title: house.address,
+      });
+    });
+
+    if (matched.length > 0) {
+      map.setBounds(bounds);
+    }
+
+    window.searchMarkers = markers;
+  };
 
   const handleReset = () => {
     setSearchQuery('');
@@ -88,7 +88,6 @@ function FindProperty() {
     setRegion('');
     setShowResults(false);
 
-    // 마커 제거
     if (window.searchMarkers) {
       window.searchMarkers.forEach(marker => marker.setMap(null));
       window.searchMarkers = [];
@@ -102,13 +101,69 @@ function FindProperty() {
       <h2>빈집 지도</h2>
 
       <div className="search-bar">
-        <input
-          type="text"
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          onKeyDown={handleKeyDown}
-          placeholder="검색어를 입력하세요 (예: 군산, 월명동)"
-        />
+        <div className="search-input-wrapper">
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            onKeyDown={handleKeyDown}
+            placeholder="검색어를 입력하세요 (예: 군산, 월명동)"
+          />
+          {showResults && (
+            <div className="search-results">
+              {houses
+                .filter((h) => h.address?.toLowerCase().includes(searchQuery.toLowerCase()))
+                .map((property, i) => {
+                  const match = property.address.match(/\(([^)]+)\)/);
+                  const dongTag = match ? `#${match[1]}` : '';
+                  const cleanAddress = property.address.replace(/\s*\([^)]+\)/, '');
+
+                  const isFavorite = favorites.includes(property.id); // ✅ 찜 여부
+                  
+                  
+
+                  const toggle = () => {
+                    if (isLoggedIn) toggleFavorite(property.id);
+                    else navigate('/login');
+                  };
+
+                  return (
+                    <div
+                      key={i}
+                      className="property-item"
+                      onClick={() => navigate(`/detail/${property.id}`)}
+                    >
+                      <img src="/default-house.png" alt="house" className="property-thumb" />
+                      <div className="property-info">
+                        <h3>{cleanAddress}</h3>
+                        {dongTag && <p className="dong-tag">{dongTag}</p>}
+                      </div>
+
+                      {/* 찜 버튼 클릭은 상위 div 클릭을 막기 위해 e.stopPropagation 추가 */}
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation(); // 상위 클릭 막음
+                          toggle();
+                        }}
+                        className="property-favorite-btn"
+                      >
+                        {isFavorite ? (
+                          <FaHeart className="heart-icon filled" />
+                        ) : (
+                          <FaRegHeart className="heart-icon" />
+                        )}
+                      </button>
+                    </div>
+                  );
+
+                })}
+              {houses.filter((h) => h.address?.toLowerCase().includes(searchQuery.toLowerCase())).length === 0 && (
+                <p>검색 결과가 없습니다.</p>
+              )}
+            </div>
+          )}
+        </div>
+
         <select value={category} onChange={(e) => setCategory(e.target.value)}>
           <option value="">용도 선택</option>
           <option value="주거용">주거용</option>
@@ -139,26 +194,6 @@ function FindProperty() {
       </div>
 
       <div id="map" className="map-placeholder"></div>
-
-      {showResults && (
-        <div className="search-results">
-          <h2>검색 결과</h2>
-          {houses.filter((h) => h.address?.toLowerCase().includes(searchQuery.toLowerCase())).length > 0 ? (
-            houses
-              .filter((h) => h.address?.toLowerCase().includes(searchQuery.toLowerCase()))
-              .map((property, i) => (
-                <div key={i} className="property-item">
-                  <div>
-                    <h3>{property.address}</h3>
-                    <p>연면적: {property.area}㎡</p>
-                  </div>
-                </div>
-              ))
-          ) : (
-            <p>검색 결과가 없습니다.</p>
-          )}
-        </div>
-      )}
     </div>
   );
 }
