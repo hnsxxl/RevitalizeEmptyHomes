@@ -68,9 +68,9 @@ function MyPage() {
       </div>
 
       <div className="mypage-myhome">
-        <h2>올린 매물</h2>
+        <h2>올린 빈집</h2>
         {myJobs.length === 0 ? (
-          <p>아직 등록한 작업(매물)이 없습니다.</p>
+          <p>아직 등록한 작업(빈집)이 없습니다.</p>
         ) : (
           <ul>
             {myJobs.map(job => (
@@ -104,9 +104,9 @@ function MyPage() {
         )}
       </div>
 
-      {/* 3D 공개 찜 매물 */}
+      {/* 3D 공개 찜 빈집 */}
       <div className="mypage-liked">
-        <h2>찜한 매물</h2>
+        <h2>찜한 빈집</h2>
         {liked3dJobs.length === 0 ? (
           <p className="mypage-empty">찜한 모델이 없습니다.</p>
         ) : (
