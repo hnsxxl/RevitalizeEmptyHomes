@@ -16,7 +16,7 @@ function Layout({ children }) {
       <nav className="navbar">
         <Link to="/" className="logo-area">
           <img src="/main_logo.png" alt="로고" className="logo-img" />
-          <span className="logo-text">머무름</span>
+          <span className="logo-text">살:림</span>
         </Link>
 
         <div className="nav-menu">

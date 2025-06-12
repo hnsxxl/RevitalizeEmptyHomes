@@ -1,15 +1,60 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from "react-router-dom";
 
-const dummy = {
-  id: 114,
-  title: "전라북도 군산시 개복길 28",
-  tags: ["개복복동", "주거용"],
-  created_at: "2025-06-01",
-  image: "http://localhost:52928/example.splat",
-  latitude: 35.9839648240786,
-  longitude: 126.714413468151,
-};
+const dummyList = [
+  {
+    id: 114,
+    title: "전라북도 군산시 개복길 28",
+    tags: ["개복동", "주거용"],
+    created_at: "2025-06-01",
+    image: "http://localhost:52928/example.splat",
+    latitude: 35.9839648240786,
+    longitude: 126.714413468151,
+    nearby: [
+      { name: "근대역사박물관", distance: "도보 7분" },
+      { name: "초원사진관", distance: "도보 5분" },
+      { name: "월명공원", distance: "도보 10분" },
+    ],
+  },
+  {
+    id: 30,
+    title: "전라북도 군산시 창성3길 8-2",
+    tags: ["개복동", "주거용"], 
+    created_at: "2025-06-12",
+    image: "http://localhost:52928/changseong3.splat",
+    latitude: 35.984500,
+    longitude: 126.715200,
+    nearby: [
+      { name: "군산근대건축관", distance: "도보 6분" },
+      { name: "진포해양테마공원", distance: "도보 9분" },
+    ],
+  },
+  {
+    id: 202,
+    title: "전라북도 군산시 신흥1길 5-9",
+    tags: ["신흥동", "상업용"],
+    created_at: "2025-06-12",
+    image: "http://localhost:52928/sinhung.splat",
+    latitude: 35.986210,
+    longitude: 126.704310,
+    nearby: [
+      { name: "은파호수공원", distance: "도보 12분" },
+    ],
+  },
+  {
+    id: 203,
+    title: "전라북도 군산시 신창로19번길 11-4",
+    tags: ["금광동", "주거용"],
+    created_at: "2025-06-12",
+    image: "http://localhost:52928/sinchang.splat",
+    latitude: 35.992400,
+    longitude: 126.709500,
+    nearby: [
+      { name: "군산예술의전당", distance: "도보 11분" },
+    ],
+  },
+];
+
 
 
 
@@ -27,19 +72,30 @@ function DetailPage() {
   const [liked, setLiked] = useState(false);
 
   useEffect(() => {
-    if (String(id) === "114") {
-      setJob(dummy);  // 👈 dummy 강제 적용
-      return;
-    }
+  const found = dummyList.find(j => String(j.id) === String(id));
+  if (found) {
+    setJob(found);
+    return;
+  }
 
-    fetch("http://localhost:8000/houses")
-      .then(res => res.json())
-      .then(jobs => {
-        const found = jobs.find(j => String(j.id) === String(id));
-        setJob(found || null);
-      });
+  fetch("http://localhost:8000/houses")
+    .then(res => res.json())
+    .then(jobs => {
+      const match = jobs.find(j => String(j.id) === String(id));
+      setJob(match || null);
+    });
 
-    setLiked(getLikedJobs().includes(String(id)));
+  setLiked(getLikedJobs().includes(String(id)));
+}, [id]);
+
+  useEffect(() => {
+    const syncLike = () => {
+      setLiked(getLikedJobs().includes(String(id)));
+    };
+    window.addEventListener('storage', syncLike);  // 다른 탭/페이지에서 찜해도 반영
+    syncLike(); // 첫 렌더 시 동기화
+
+    return () => window.removeEventListener('storage', syncLike);
   }, [id]);
 
   useEffect(() => {
@@ -127,6 +183,16 @@ function DetailPage() {
           }}
         >{liked ? "❤️ 찜 완료" : "🤍 찜하기"}</button>
 
+        {job.nearby && job.nearby.length > 0 && (
+          <div style={{ marginTop: 20 }}>
+            <h3 style={{ fontSize: 18, marginBottom: 8 }}>주변 관광지</h3>
+            <ul style={{ paddingLeft: 18, color: "#444", lineHeight: 1.6, listStyle: "none"  }}>
+              {job.nearby.map((place, i) => (
+                <li key={i}>• {place.name} ({place.distance})</li>
+              ))}
+            </ul>
+          </div>
+        )}
         <div
           id="detail-map"
           style={{

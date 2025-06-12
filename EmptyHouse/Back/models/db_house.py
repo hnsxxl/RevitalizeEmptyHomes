@@ -11,3 +11,6 @@ class House(Base):
     # area = Column(Float)
     latitude = Column(Float)
     longitude = Column(Float)
+    
+
+

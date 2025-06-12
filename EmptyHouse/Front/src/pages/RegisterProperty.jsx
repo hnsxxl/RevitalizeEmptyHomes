@@ -81,7 +81,7 @@ function RegisterProperty() {
 
         {/* 매도 정보 */}
         <fieldset className="form-section">
-          <legend><strong>매도 정보</strong></legend>
+          <legend><strong>빈집 정보</strong></legend>
 
           <div className="form-row">
             <label htmlFor="address">주소</label>
@@ -116,7 +116,7 @@ function RegisterProperty() {
 
         {/* 이미지 업로드 */}
         <fieldset className="form-section">
-          <legend><strong>대표 사진 업로드</strong></legend>
+          <legend><strong>빈집 사진/영상 업로드</strong></legend>
           <input type="file" accept="image/*" multiple onChange={handleImageChange} /><br /><br />
           <div className="image-preview-box">
             {formData.images.map((image, idx) => (

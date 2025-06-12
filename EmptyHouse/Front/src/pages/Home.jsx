@@ -1,18 +1,46 @@
+// Home.jsx 추천 매물에서 dummyList 연결
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import './Home.css';
+
+const dummyList = [
+  {
+    id: 114,
+    title: "전라북도 군산시 개복길 28",
+    tags: ["개복동", "주거용"],
+    created_at: "2025-06-01",
+    image: "/images/gaebok28.jpg",
+  },
+  {
+    id: 201,
+    title: "전라북도 군산시 창성3길 8-2",
+    tags: ["개복동", "주거용"],
+    created_at: "2025-06-12",
+    image: "/images/changseong3.jpg",
+  },
+  {
+    id: 202,
+    title: "전라북도 군산시 신흥1길 5-9",
+    tags: ["신흥동", "상업용"],
+    created_at: "2025-06-12",
+    image: "/images/sinhung.jpg",
+  },
+  {
+    id: 203,
+    title: "전라북도 군산시 신창로19번길 11-4",
+    tags: ["금광동", "주거용"],
+    created_at: "2025-06-12",
+    image: "/images/sinchang.jpg",
+  },
+];
 
 function Home() {
   const navigate = useNavigate();
   const [publicJobs, setPublicJobs] = useState([]);
   const [currentSlide, setCurrentSlide] = useState(0);
 
-  // --- 공개된 작업 가져오기 ---
   useEffect(() => {
-    fetch("http://localhost:8000/published_jobs")
-      .then(res => res.json())
-      .then(setPublicJobs)
-      .catch(console.error);
+    setPublicJobs(dummyList); // 👈 dummy 데이터 사용
   }, []);
 
   const itemsPerSlide = 4;
@@ -34,14 +62,21 @@ function Home() {
 
   return (
     <div className="home-container">
-  
-
-      <section style={{ background: "#f0f0f0", height: "300px", marginBottom: "50px" }}>
-        <h2 style={{ textAlign: "center", lineHeight: "300px" }}>사이트 소개 사진 자리</h2>
-      </section>
+      <img
+        src="/images/site-intro.png"
+        alt="사이트 소개"
+        style={{
+          width: '90%',
+          maxWidth: '1200px',
+          height: 'auto',
+          display: 'block',
+          margin: '40px auto',
+          borderRadius: '12px',
+        }}
+      />
 
       <section className="recommend-section" style={{ textAlign: "center" }}>
-        <h2>추천 매물 (공개된 가우시안 모델!)</h2>
+        <h2>추천 매물</h2>
         <div style={{ display: "flex", justifyContent: "center", position: "relative", marginTop: "20px" }}>
           <div style={{
             display: "grid",
@@ -85,10 +120,10 @@ function Home() {
               </div>
             ))}
           </div>
-          {/* ...이하 생략... */}
         </div>
       </section>
     </div>
   );
 }
+
 export default Home;

@@ -18,6 +18,14 @@ function MyPage() {
   const [showSplit, setShowSplit] = useState(false);
   const [selectedJobUuid, setSelectedJobUuid] = useState(null);
   const [liked3dJobs, setLiked3dJobs] = useState([]);
+  const [houseData, setHouseData] = useState([]);
+
+  const imageMap = {
+    "114": "/images/gaebok28.jpg",
+    "30": "/images/changseong3.jpg",
+    "202": "/images/sinhung.jpg",
+    "203": "/images/sinchang.jpg"
+  };
 
   // 내 작업 목록
   useEffect(() => {
@@ -33,19 +41,34 @@ function MyPage() {
   }, [user]);
 
   // 공개 3D 찜 목록
+  const [refresh, setRefresh] = useState(0);
+
   useEffect(() => {
     const likedList = getLikedJobs();
     if (likedList.length === 0) {
       setLiked3dJobs([]);
       return;
     }
-    fetch("http://localhost:8000/published_jobs")
+
+    fetch("http://localhost:8000/houses")
       .then(res => res.json())
-      .then(jobs => {
-        const liked = jobs.filter(j => likedList.includes(String(j.id)));
-        setLiked3dJobs(liked);
+      .then(data => {
+        setHouseData(data);  // 전체 데이터 저장
+        const liked = data.filter(h => likedList.includes(String(h.id)));
+        setLiked3dJobs(liked);  // 필터링된 찜 목록만 set
+      })
+      .catch(err => {
+        console.error("빈집 데이터 불러오기 실패:", err);
       });
+  }, [refresh]);
+
+  // 새로운 useEffect 추가 (storage 이벤트 감지용)
+  useEffect(() => {
+    const sync = () => setRefresh(r => r + 1);  // refresh 증가 = 리렌더 유도
+    window.addEventListener('storage', sync);
+    return () => window.removeEventListener('storage', sync);
   }, []);
+
 
   if (!isLoggedIn) {
     navigate('/login');
@@ -111,31 +134,33 @@ function MyPage() {
           <p className="mypage-empty">찜한 모델이 없습니다.</p>
         ) : (
           <div className="mypage-liked-grid">
-            {liked3dJobs.map(job => (
-              <div
-                key={job.id}
-                className="mypage-card"
-                onClick={() => window.open(`/detail/${job.id}`, "_blank")}
-                style={{
-                  background: "#fff", borderRadius: 12, boxShadow: "0 2px 8px #e2e6f1",
-                  overflow: "hidden", cursor: "pointer"
-                }}
-              >
-                <img
-                  src={job.image}
-                  alt={job.title}
-                  className="mypage-card-img"
-                  style={{ width: "100%", height: "130px", objectFit: "cover" }}
-                />
-                <div style={{ padding: 10 }}>
-                  <h3 style={{ fontWeight: 600 }}>{job.title}</h3>
-                  <p style={{ fontSize: "0.85rem", color: "#556" }}>
-                    #{job.tags && job.tags.join(" #")}
-                  </p>
-                  <div style={{ color: "#3377ee", fontSize: 12 }}>{job.created_at}</div>
+            {liked3dJobs.map(job => {
+              const thumbSrc = imageMap[String(job.id)] || "/default-house.png"; // ✅ 썸네일 결정
+
+              return (
+                <div
+                  key={job.id}
+                  className="mypage-card"
+                  onClick={() => window.open(`/detail/${job.id}`, "_blank")}
+                  style={{
+                    background: "#fff", borderRadius: 12, boxShadow: "0 2px 8px #e2e6f1",
+                    overflow: "hidden", cursor: "pointer"
+                  }}
+                >
+                  <img
+                    src={thumbSrc} // ✅ 썸네일 적용
+                    alt={job.title}
+                    className="mypage-card-img"
+                    style={{ width: "100%", height: "130px", objectFit: "cover" }}
+                  />
+                  <div style={{ padding: 10 }}>
+                    <h3 style={{ fontWeight: 600 }}>{job.address || "주소 없음"}</h3>
+                    {job.tags && <p style={{ fontSize: "0.85rem", color: "#556" }}>#{job.tags.join(" #")}</p>}
+                    <div style={{ color: "#3377ee", fontSize: 12 }}>{job.created_at || ""}</div>
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         )}
       </div>

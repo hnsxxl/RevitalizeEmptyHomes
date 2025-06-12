@@ -1,11 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FaHeart, FaRegHeart } from 'react-icons/fa';
 import { useAuth } from '../contexts/AuthContext';
-import { useProperty } from '../contexts/PropertyContext';
 import './FindProperty.css';
 
-
+// ✅ localStorage 기반 찜 저장소
+function getLikedJobs() {
+  return JSON.parse(localStorage.getItem('liked3dJobs') || "[]");
+}
+function setLikedJobs(list) {
+  localStorage.setItem('liked3dJobs', JSON.stringify(list));
+}
 
 function FindProperty() {
   const navigate = useNavigate();
@@ -14,10 +18,11 @@ function FindProperty() {
   const [region, setRegion] = useState('');
   const [showResults, setShowResults] = useState(false);
   const [houses, setHouses] = useState([]);
+  const [likedList, setLikedList] = useState(getLikedJobs());  // ✅ 찜 상태 저장
 
   const { isLoggedIn } = useAuth();
-  const { properties, favorites, toggleFavorite } = useProperty();
 
+  // 지도 및 빈집 데이터 불러오기
   useEffect(() => {
     const script = document.createElement('script');
     script.src = "https://dapi.kakao.com/v2/maps/sdk.js?appkey=28cfa7959f3cd4e4af75479d4c01d7b9&autoload=false";
@@ -43,9 +48,15 @@ function FindProperty() {
     document.head.appendChild(script);
   }, []);
 
+  // ✅ 다른 탭에서 찜한 게 반영되도록
+  useEffect(() => {
+    const sync = () => setLikedList(getLikedJobs());
+    window.addEventListener("storage", sync);
+    return () => window.removeEventListener("storage", sync);
+  }, []);
+
   const handleSearchSubmit = () => {
     setShowResults(true);
-    
 
     if (window.searchMarkers) {
       window.searchMarkers.forEach(marker => marker.setMap(null));
@@ -68,12 +79,21 @@ function FindProperty() {
     const markers = matched.map((house) => {
       const position = new window.kakao.maps.LatLng(house.lat, house.lng);
       bounds.extend(position);
-      return new window.kakao.maps.Marker({
+
+      const marker = new window.kakao.maps.Marker({
         map: map,
         position: position,
         title: house.address,
       });
+
+      // ✅ 클릭 시 상세 페이지로 이동
+      window.kakao.maps.event.addListener(marker, 'click', () => {
+        navigate(`/detail/${house.id}`);
+      });
+
+      return marker;
     });
+
 
     if (matched.length > 0) {
       map.setBounds(bounds);
@@ -96,6 +116,13 @@ function FindProperty() {
 
   const handleKeyDown = (e) => e.key === 'Enter' && handleSearchSubmit();
 
+  const imageMap = {
+    "114": "/images/gaebok28.jpg",
+    "30": "/images/changseong3.jpg",
+    "202": "/images/sinhung.jpg",
+    "203": "/images/sinchang.jpg"
+  };
+
   return (
     <div className="find-property-container">
       <h2>빈집 지도</h2>
@@ -114,17 +141,30 @@ function FindProperty() {
               {houses
                 .filter((h) => h.address?.toLowerCase().includes(searchQuery.toLowerCase()))
                 .map((property, i) => {
+                  const strId = String(property.id);
+                  const isFavorite = likedList.includes(strId);
+                  const thumbSrc = imageMap[strId] || "/default-house.png";
+
                   const match = property.address.match(/\(([^)]+)\)/);
                   const dongTag = match ? `#${match[1]}` : '';
                   const cleanAddress = property.address.replace(/\s*\([^)]+\)/, '');
 
-                  const isFavorite = favorites.includes(property.id); // ✅ 찜 여부
-                  
-                  
-
                   const toggle = () => {
-                    if (isLoggedIn) toggleFavorite(property.id);
-                    else navigate('/login');
+                    if (!isLoggedIn) {
+                      navigate("/login");
+                      return;
+                    }
+
+                    let updated = [...likedList];
+                    if (updated.includes(strId)) {
+                      updated = updated.filter(id => id !== strId);
+                    } else {
+                      updated.push(strId);
+                    }
+
+                    setLikedJobs(updated);
+                    setLikedList(updated);
+                    window.dispatchEvent(new Event("storage"));
                   };
 
                   return (
@@ -133,30 +173,26 @@ function FindProperty() {
                       className="property-item"
                       onClick={() => navigate(`/detail/${property.id}`)}
                     >
-                      <img src="/default-house.png" alt="house" className="property-thumb" />
+                      <img src={thumbSrc} alt="house" className="property-thumb" />
+
                       <div className="property-info">
                         <h3>{cleanAddress}</h3>
                         {dongTag && <p className="dong-tag">{dongTag}</p>}
                       </div>
 
-                      {/* 찜 버튼 클릭은 상위 div 클릭을 막기 위해 e.stopPropagation 추가 */}
                       <button
                         onClick={(e) => {
-                          e.stopPropagation(); // 상위 클릭 막음
+                          e.stopPropagation();
                           toggle();
                         }}
                         className="property-favorite-btn"
                       >
-                        {isFavorite ? (
-                          <FaHeart className="heart-icon filled" />
-                        ) : (
-                          <FaRegHeart className="heart-icon" />
-                        )}
+                        <span className="heart-text">{isFavorite ? '❤️' : '🤍'}</span>
                       </button>
                     </div>
                   );
-
                 })}
+
               {houses.filter((h) => h.address?.toLowerCase().includes(searchQuery.toLowerCase())).length === 0 && (
                 <p>검색 결과가 없습니다.</p>
               )}
