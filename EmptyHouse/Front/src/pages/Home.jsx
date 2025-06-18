@@ -13,10 +13,10 @@ const dummyList = [
   },
   {
     id: 201,
-    title: "전라북도 군산시 창성3길 8-2",
+    title: "전라북도 군산시 구영3길 31-3",
     tags: ["개복동", "주거용"],
     created_at: "2025-06-12",
-    image: "/images/changseong3.jpg",
+    image: "/images/gy3.jpg",
   },
   {
     id: 202,
@@ -66,7 +66,7 @@ function Home() {
         src="/images/site-intro.png"
         alt="사이트 소개"
         style={{
-          width: '90%',
+          width: '80%',
           maxWidth: '1200px',
           height: 'auto',
           display: 'block',

@@ -7,7 +7,7 @@ const dummyList = [
     title: "전라북도 군산시 개복길 28",
     tags: ["개복동", "주거용"],
     created_at: "2025-06-01",
-    image: "http://localhost:52928/example.splat",
+    image: "http://localhost:65255/example.splat",
     latitude: 35.9839648240786,
     longitude: 126.714413468151,
     nearby: [
@@ -21,7 +21,7 @@ const dummyList = [
     title: "전라북도 군산시 창성3길 8-2",
     tags: ["개복동", "주거용"], 
     created_at: "2025-06-12",
-    image: "http://localhost:52928/changseong3.splat",
+    image: "http://localhost:65255/changseong3.splat",
     latitude: 35.984500,
     longitude: 126.715200,
     nearby: [
@@ -34,7 +34,7 @@ const dummyList = [
     title: "전라북도 군산시 신흥1길 5-9",
     tags: ["신흥동", "상업용"],
     created_at: "2025-06-12",
-    image: "http://localhost:52928/sinhung.splat",
+    image: "http://localhost:65255/sinhung.splat",
     latitude: 35.986210,
     longitude: 126.704310,
     nearby: [
@@ -46,7 +46,7 @@ const dummyList = [
     title: "전라북도 군산시 신창로19번길 11-4",
     tags: ["금광동", "주거용"],
     created_at: "2025-06-12",
-    image: "http://localhost:52928/sinchang.splat",
+    image: "http://localhost:65255/sinchang.splat",
     latitude: 35.992400,
     longitude: 126.709500,
     nearby: [
@@ -138,7 +138,7 @@ function DetailPage() {
       <div style={{ flex: 2 }}>
         <h2 style={{ fontWeight: 600, marginBottom: 16 }}> 빈집 미리보기</h2>
         <iframe
-          src={`http://localhost:52928/?file=${encodeURIComponent(job.image)}`}
+          src={`http://localhost:65255/?file=${encodeURIComponent(job.image)}`}
           title="supersplat"
           width="100%"
           height="540"

@@ -49,7 +49,7 @@ function RegisterProperty() {
     });
     const result = await response.json();
     console.log('서버 응답:', result);
-    alert('매물 등록이 완료되었습니다! 결과: ' + (result.result_path || '없음'));
+    alert('매물 등록이 완료되었습니다!');
   } catch (error) {
     alert('등록 중 오류 발생: ' + error.message);
   }
@@ -57,7 +57,7 @@ function RegisterProperty() {
 
   return (
     <div className="register-container">
-      <h1>매도 의뢰</h1>
+      <h1>빈집 의뢰</h1>
       <form onSubmit={handleSubmit}>
         {/* 의뢰인 정보 */}
         <fieldset className="form-section">
@@ -89,28 +89,8 @@ function RegisterProperty() {
           </div>
 
           <div className="form-row">
-            <label htmlFor="area">면적</label>
-            <input type="text" id="area" name="area" value={formData.area} onChange={handleChange} required />
-          </div>
-
-          <div className="form-row">
-            <label htmlFor="yearBuilt">준공년도</label>
-            <input type="text" id="yearBuilt" name="yearBuilt" value={formData.yearBuilt} onChange={handleChange} required />
-          </div>
-
-          <div className="form-row">
-            <label htmlFor="floors">층수</label>
-            <input type="text" id="floors" name="floors" value={formData.floors} onChange={handleChange} required />
-          </div>
-
-          <div className="form-row">
             <label htmlFor="usage">용도</label>
             <input type="text" id="usage" name="usage" value={formData.usage} onChange={handleChange} required />
-          </div>
-
-          <div className="form-row">
-            <label htmlFor="touristSpots">주변 관광지</label>
-            <input type="text" id="touristSpots" name="touristSpots" value={formData.touristSpots} onChange={handleChange} />
           </div>
         </fieldset>
 
